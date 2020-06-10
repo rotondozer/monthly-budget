@@ -1,6 +1,10 @@
 module Main where
 
-import Lib
+import           Lib                            ( monthlyBudget )
 
 main :: IO ()
-main = someFunc
+main = do
+    contents <- readFile "../../Downloads/EXPORT.CSV"
+    let budget = monthlyBudget contents
+    -- writeFile "../../Downloads/monthly-budget.txt" (budget)
+    mapM_ putStrLn (head budget)

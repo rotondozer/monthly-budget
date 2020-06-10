@@ -1,6 +1,9 @@
 module Lib
-    ( someFunc
-    ) where
+    ( monthlyBudget
+    )
+where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import qualified Table
+
+monthlyBudget :: String -> Table.Table
+monthlyBudget = Table.toTable

@@ -4,14 +4,14 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2e1a6b97770553bd51e2fe6460ce9462ba696e353f39bb7918f365c72bb22016
+-- hash: 91c65d68b41b40ceddd0497bec272215495fea56667348988e4869c544f3f645
 
 name:           monthly-budget
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/monthly-budget#readme>
-homepage:       https://github.com/githubuser/monthly-budget#readme
-bug-reports:    https://github.com/githubuser/monthly-budget/issues
-author:         Author name here
+description:    Please see the README on GitHub at <https://github.com/rotondozer/monthly-budget#readme>
+homepage:       https://github.com/rotondozer/monthly-budget#readme
+bug-reports:    https://github.com/rotondozer/monthly-budget/issues
+author:         Nick Rotondo
 maintainer:     nickrotondo724@gmail.com
 copyright:      2020 Nick Rotondo (rotondozer)
 license:        BSD3
@@ -27,8 +27,8 @@ source-repository head
 
 library
   exposed-modules:
-      Grid
       Lib
+      Table
   other-modules:
       Paths_monthly_budget
   hs-source-dirs:
