@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3ec5bca25953273fadd9d543a11a7725c2eba772341e53d317c5b9ffdbcfa9af
+-- hash: 2e1a6b97770553bd51e2fe6460ce9462ba696e353f39bb7918f365c72bb22016
 
 name:           monthly-budget
 version:        0.1.0.0
@@ -12,8 +12,8 @@ description:    Please see the README on GitHub at <https://github.com/githubuse
 homepage:       https://github.com/githubuser/monthly-budget#readme
 bug-reports:    https://github.com/githubuser/monthly-budget/issues
 author:         Author name here
-maintainer:     example@example.com
-copyright:      2020 Author name here
+maintainer:     nickrotondo724@gmail.com
+copyright:      2020 Nick Rotondo (rotondozer)
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -23,10 +23,11 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/monthly-budget
+  location: https://github.com/rotondozer/monthly-budget
 
 library
   exposed-modules:
+      Grid
       Lib
   other-modules:
       Paths_monthly_budget
@@ -34,6 +35,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , split
   default-language: Haskell2010
 
 executable monthly-budget-exe
@@ -46,6 +48,7 @@ executable monthly-budget-exe
   build-depends:
       base >=4.7 && <5
     , monthly-budget
+    , split
   default-language: Haskell2010
 
 test-suite monthly-budget-test
@@ -59,4 +62,5 @@ test-suite monthly-budget-test
   build-depends:
       base >=4.7 && <5
     , monthly-budget
+    , split
   default-language: Haskell2010
