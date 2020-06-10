@@ -1,0 +1,62 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 3ec5bca25953273fadd9d543a11a7725c2eba772341e53d317c5b9ffdbcfa9af
+
+name:           monthly-budget
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/monthly-budget#readme>
+homepage:       https://github.com/githubuser/monthly-budget#readme
+bug-reports:    https://github.com/githubuser/monthly-budget/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2020 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/monthly-budget
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_monthly_budget
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable monthly-budget-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_monthly_budget
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , monthly-budget
+  default-language: Haskell2010
+
+test-suite monthly-budget-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_monthly_budget
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , monthly-budget
+  default-language: Haskell2010
