@@ -7,19 +7,23 @@ import qualified Data.Map                      as Map
 import           Data.Maybe                     ( fromMaybe )
 import qualified Table
 
-type Expenses = Map.Map String String
+type Expenses = Map.Map String Float
 
 monthlyBudget :: String -> Expenses
 monthlyBudget csv = expenses (Table.toTable csv)
 
-expenses :: Table.Table -> Map.Map String String
-expenses table@(headers : rows) = Map.fromList $ map
-    (\row ->
-        ( fromMaybe "No Description" (getDescription row)
-        , fromMaybe "0"              (getAmount row)
-        )
-    )
-    rows
+expenses :: Table.Table -> Expenses
+expenses table@(_ : rows) = Map.fromList
+    $ map (\r -> (description r, amount r)) rows
   where
-    getDescription = Table.getCell table "\"Description\""
-    getAmount      = Table.getCell table "\"Amount\""
+    amount      = getAmount table
+    description = getDescription table
+
+
+getDescription :: Table.Table -> Table.Row -> String
+getDescription table row =
+    fromMaybe "No Description" (Table.getCell table "\"Description\"" row)
+
+getAmount :: Table.Table -> Table.Row -> Float
+getAmount table row =
+    read (fromMaybe "0" (Table.getCell table "\"Amount\"" row)) :: Float

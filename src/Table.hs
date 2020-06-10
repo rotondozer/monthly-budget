@@ -1,5 +1,6 @@
 module Table
-    ( Table
+    ( Row
+    , Table
     , toTable
     , getCell
     )
