@@ -1,11 +1,12 @@
 module Table
-    ( toTable
-    , Table
+    ( Table
+    , toTable
+    , getCell
     )
 where
 
-import           Data.List.Split                ( splitOneOf )
 import           Data.List
+import           Data.List.Split                ( splitOneOf )
 
 type Header = String
 type Row = [String]
@@ -17,11 +18,9 @@ type Table = [Row]
 -- , ["CREDIT",           "6/3/20", "Checking",     "PAYCHECK",    "500",    "",              "$500",    ""]
 -- ]
 toTable :: String -> Table
-toTable csv =
-    let tableHeaders = splitOneOf ",\\" header
-        tableRows    = map (splitOneOf ",") rows
-    in  tableHeaders : tableRows
-    where (header : rows) = (lines csv)
+toTable csv = map (splitOneOf ",") (lines csv)
 
-columnIndexFor :: Header -> Table -> Maybe Int
-columnIndexFor header (tableHeaders : _) = elemIndex header tableHeaders
+getCell :: Table -> Header -> Row -> Maybe String
+getCell (headers : rows) header row =
+    (header `elemIndex` headers) >>= \i -> return (row !! i)
+

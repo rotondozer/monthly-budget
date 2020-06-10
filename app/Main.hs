@@ -7,4 +7,4 @@ main = do
     contents <- readFile "../../Downloads/EXPORT.CSV"
     let budget = monthlyBudget contents
     -- writeFile "../../Downloads/monthly-budget.txt" (budget)
-    mapM_ putStrLn (head budget)
+    print budget

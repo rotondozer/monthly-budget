@@ -1,0 +1,4 @@
+# This file exists to workaround an issue with the IDE engine
+# https://github.com/haskell/haskell-ide-engine/issues/1616
+
+cradle: { stack: {}}

@@ -13,6 +13,7 @@ tests:
 copyright: 2020 Nick Rotondo (rotondozer)
 maintainer: nickrotondo724@gmail.com
 dependencies:
+- containers
 - split
 - base >= 4.7 && < 5
 name: monthly-budget
