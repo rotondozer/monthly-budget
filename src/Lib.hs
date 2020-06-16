@@ -9,17 +9,12 @@ import qualified Table
 import qualified CashFlow
 
 monthlyBudget :: String -> [CashFlow.CashFlowTotals]
-monthlyBudget csv = totaledCashFlow (Table.toTable csv)
+monthlyBudget =
+    CashFlow.toList . addAmounts . tableToDebitsAndCredits . Table.toTable
+    where addAmounts = CashFlow.map' (Map.fromListWith CashFlow.addAmounts)
 
-totaledCashFlow :: Table.Table -> [CashFlow.CashFlowTotals]
-totaledCashFlow table@(_ : rows) =
-    let (d, c)  = tableToBudget table
-        debits  = Map.fromListWith CashFlow.addAmounts d
-        credits = Map.fromListWith CashFlow.addAmounts c
-    in  [debits, credits]
-
-tableToBudget :: Table.Table -> CashFlow.DebitsAndCredits
-tableToBudget table@(_ : rows) = foldl
+tableToDebitsAndCredits :: Table.Table -> CashFlow.DebitsAndCredits
+tableToDebitsAndCredits table@(_ : rows) = foldl
     (\debsAndCreds row ->
         CashFlow.addToDebsAndCreds (description row, amount row) debsAndCreds
     )

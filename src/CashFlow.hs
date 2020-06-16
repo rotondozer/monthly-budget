@@ -6,7 +6,9 @@ module CashFlow
     , CashFlowTotals
     , addAmounts
     , addToDebsAndCreds
+    , map'
     , readAmount
+    , toList
     )
 where
 
@@ -31,7 +33,12 @@ addAmounts :: Amount -> Amount -> Amount
 addAmounts a1 a2 = show $ (readAmount a1) + (readAmount a2)
 
 addToDebsAndCreds :: CashFlow -> DebitsAndCredits -> DebitsAndCredits
-addToDebsAndCreds cashFlow@(_, amt) (debits, credits) =
-    if (CashFlow.readAmount amt) < 0
-        then (debits ++ [cashFlow], credits)
-        else (debits, credits ++ [cashFlow])
+addToDebsAndCreds cf@(_, amt) (debits, credits) = if (readAmount amt) < 0
+    then (debits ++ [cf], credits)
+    else (debits, credits ++ [cf])
+
+map' :: (a -> b) -> (a, a) -> (b, b)
+map' f (x, y) = (f x, f y)
+
+toList :: (a, a) -> [a]
+toList (x, y) = [x, y]
