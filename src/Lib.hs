@@ -3,22 +3,20 @@ module Lib
     )
 where
 
-import qualified Data.Map                      as Map
 import           Data.Maybe                     ( fromMaybe )
 import qualified Table
 import qualified CashFlow
 
-monthlyBudget :: String -> [CashFlow.CashFlowTotals]
-monthlyBudget =
-    CashFlow.toList . addAmounts . tableToDebitsAndCredits . Table.toTable
-    where addAmounts = CashFlow.map' (Map.fromListWith CashFlow.addAmounts)
+monthlyBudget :: String -> [CashFlow.CashFlowMap]
+monthlyBudget csv = map CashFlow.toMapWithAmountSum (toDebsAndCreds csv)
+    where toDebsAndCreds = tableToDebitsAndCredits . Table.toTable
 
-tableToDebitsAndCredits :: Table.Table -> CashFlow.DebitsAndCredits
+tableToDebitsAndCredits :: Table.Table -> [[CashFlow.CashFlow]]
 tableToDebitsAndCredits table@(_ : rows) = foldl
     (\debsAndCreds row ->
         CashFlow.addToDebsAndCreds (description row, amount row) debsAndCreds
     )
-    ([], [])
+    [[], []]
     rows
   where
     amount      = getAmount table

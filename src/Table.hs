@@ -8,7 +8,6 @@ where
 
 import           Data.List
 import           Data.List.Split                ( splitOneOf )
-import           Data.Char                      ( isAlphaNum )
 
 type Header = String
 type Row = [String]
