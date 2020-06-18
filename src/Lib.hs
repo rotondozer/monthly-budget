@@ -7,9 +7,11 @@ import           Data.Maybe                     ( fromMaybe )
 import qualified Table
 import qualified CashFlow
 
-monthlyBudget :: String -> [CashFlow.CashFlowMap]
-monthlyBudget csv = map CashFlow.toMapWithAmountSum (toDebsAndCreds csv)
-    where toDebsAndCreds = tableToDebitsAndCredits . Table.toTable
+monthlyBudget :: String -> [[String]]
+monthlyBudget = CashFlow.fromMapsToMatrix . sumDebsAndCreds . toDebsAndCreds
+  where
+    toDebsAndCreds  = tableToDebitsAndCredits . Table.toTable
+    sumDebsAndCreds = map CashFlow.toMapWithAmountSum
 
 tableToDebitsAndCredits :: Table.Table -> [[CashFlow.CashFlow]]
 tableToDebitsAndCredits table@(_ : rows) = foldl

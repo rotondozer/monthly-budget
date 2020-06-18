@@ -5,6 +5,7 @@ module CashFlow
     , CashFlowMap
     , addAmounts
     , addToDebsAndCreds
+    , fromMapsToMatrix
     , readAmount
     , toMapWithAmountSum
     )
@@ -35,10 +36,15 @@ addToDebsAndCreds cf@(_, amt) (debits : credits : _) = if (readAmount amt) < 0
     else [debits, credits ++ [cf]]
 
 -- CashFlowMap
+-- Converting to a map makes the entries unique, and sum duplicate entries
 
--- Converting to a map makes the entries unique, and we sum duplicate entries
 toMapWithAmountSum :: [CashFlow] -> CashFlowMap
 toMapWithAmountSum = Map.fromListWith addAmounts
 
-fromMap :: CashFlowMap -> [CashFlow]
-fromMap = Map.toList
+toList :: CashFlow -> [String]
+toList (debits, credits) = [debits, credits]
+
+fromMapsToMatrix :: [CashFlowMap] -> [[String]]
+fromMapsToMatrix [] = []
+fromMapsToMatrix (mapA : maps) =
+    (map toList (Map.toList mapA)) ++ (fromMapsToMatrix maps)
