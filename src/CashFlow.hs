@@ -54,7 +54,7 @@ totalsFromDebsAndCreds (debits : credits : _) =
             "Total Credits"
             totalCredit
             (Map.insert "Total Debits" totalDebit Map.empty)
-    in  [debits, credits, totals]
+    in  [debits, credits, Map.insert "NET" (mapTotal totals) totals]
 
 toList :: CashFlow -> [String]
 toList (debits, credits) = [debits, credits]
