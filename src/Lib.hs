@@ -8,7 +8,11 @@ import qualified Table
 import qualified CashFlow
 
 monthlyBudget :: String -> [[String]]
-monthlyBudget = CashFlow.fromMapsToMatrix . sumDebsAndCreds . toDebsAndCreds
+monthlyBudget =
+    CashFlow.fromMapsToMatrix
+        . CashFlow.totalsFromDebsAndCreds
+        . sumDebsAndCreds
+        . toDebsAndCreds
   where
     toDebsAndCreds  = tableToDebitsAndCredits . Table.toTable
     sumDebsAndCreds = map CashFlow.toMapWithAmountSum

@@ -6,8 +6,10 @@ module CashFlow
     , addAmounts
     , addToDebsAndCreds
     , fromMapsToMatrix
+    , mapTotal
     , readAmount
     , toMapWithAmountSum
+    , totalsFromDebsAndCreds
     )
 where
 
@@ -40,6 +42,19 @@ addToDebsAndCreds cf@(_, amt) (debits : credits : _) = if (readAmount amt) < 0
 
 toMapWithAmountSum :: [CashFlow] -> CashFlowMap
 toMapWithAmountSum = Map.fromListWith addAmounts
+
+mapTotal :: CashFlowMap -> Amount
+mapTotal = Map.foldl addAmounts "0"
+
+totalsFromDebsAndCreds :: [CashFlowMap] -> [CashFlowMap]
+totalsFromDebsAndCreds (debits : credits : _) =
+    let totalDebit  = CashFlow.mapTotal debits
+        totalCredit = CashFlow.mapTotal credits
+        totals      = Map.insert
+            "Total Credits"
+            totalCredit
+            (Map.insert "Total Debits" totalDebit Map.empty)
+    in  [debits, credits, totals]
 
 toList :: CashFlow -> [String]
 toList (debits, credits) = [debits, credits]
