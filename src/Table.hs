@@ -1,6 +1,7 @@
 module Table
     ( Row
     , Table
+    , toCSV
     , toTable
     , getCell
     )
@@ -36,3 +37,6 @@ stringCleanup = unwords . words . unnestString
 -- "\"Transaction Type\"" -> "Transaction Type"
 unnestString :: String -> String
 unnestString str = [ c | c <- str, c /= '"', c /= '/' ] -- surely there's a more Haskelly way to do a filter or...
+
+toCSV :: [[String]] -> String
+toCSV matrix = unlines (map (intercalate ",") matrix)

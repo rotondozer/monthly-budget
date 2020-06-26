@@ -7,9 +7,10 @@ import           Data.Maybe                     ( fromMaybe )
 import qualified Table
 import qualified CashFlow
 
-monthlyBudget :: String -> [[String]]
+monthlyBudget :: String -> String
 monthlyBudget =
-    CashFlow.fromMapsToMatrix
+    Table.toCSV
+        . CashFlow.fromMapsToMatrix
         . CashFlow.totalsFromDebsAndCreds
         . sumDebsAndCreds
         . toDebsAndCreds

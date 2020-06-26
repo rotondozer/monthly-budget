@@ -6,5 +6,5 @@ main :: IO ()
 main = do
     contents <- readFile "../../Downloads/EXPORT.CSV"
     let budget = monthlyBudget contents
-    -- writeFile "../../Downloads/monthly-budget.txt" (budget)
+    writeFile "../../Downloads/monthly-budget.csv" budget
     print budget
