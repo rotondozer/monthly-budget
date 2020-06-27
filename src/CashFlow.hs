@@ -63,7 +63,8 @@ fromMapsToMatrix (debits : credits : _) =
                ]
     where toSortedList = (map toList) . sortCashFlows . Map.toList
 
+-- Sort the greater absolute value to be higher, so highest expense and highest credit appear first
 sortCashFlows :: [CashFlow] -> [CashFlow]
-sortCashFlows =
-    sortBy (\(_, a) (_, b) -> compare (readAmount a) (readAmount b))
+sortCashFlows = sortBy (\(_, a) (_, b) -> compare (absAmount b) (absAmount a))
+    where absAmount = abs . readAmount
 
