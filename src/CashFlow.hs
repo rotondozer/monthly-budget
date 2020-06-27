@@ -9,7 +9,6 @@ module CashFlow
     , mapTotal
     , readAmount
     , toMapWithAmountSum
-    , totalsFromDebsAndCreds
     )
 where
 
@@ -20,6 +19,7 @@ where
 
 import qualified Data.Map                      as Map
 import qualified Data.Set                      as Set
+import           Data.List                      ( sortBy )
 
 type Amount = String -- tobe Float
 type Description = String
@@ -50,17 +50,20 @@ toMapWithAmountSum = Map.fromListWith addAmounts
 mapTotal :: CashFlowMap -> Amount
 mapTotal = Map.foldl addAmounts "0"
 
-totalsFromDebsAndCreds :: [CashFlowMap] -> [CashFlowMap]
-totalsFromDebsAndCreds (debits : credits : _) =
-    let totalDebit  = CashFlow.mapTotal debits
-        totalCredit = CashFlow.mapTotal credits
-        totals      = Map.insert
-            "Total Credits"
-            totalCredit
-            (Map.insert "Total Debits" totalDebit Map.empty)
-    in  [debits, credits, Map.insert "NET" (mapTotal totals) totals]
-
 fromMapsToMatrix :: [CashFlowMap] -> [[String]]
 fromMapsToMatrix [] = []
-fromMapsToMatrix (mapA : maps) =
-    (map toList (Map.toList mapA)) ++ (fromMapsToMatrix maps)
+fromMapsToMatrix (debits : credits : _) =
+    let totalCred = mapTotal credits
+        totalDeb  = mapTotal debits
+    in  (toSortedList debits)
+            ++ (toSortedList credits)
+            ++ [ ["Total Credits", totalCred]
+               , ["Total Debits", totalDeb]
+               , ["NET", addAmounts totalCred totalDeb]
+               ]
+    where toSortedList = (map toList) . sortCashFlows . Map.toList
+
+sortCashFlows :: [CashFlow] -> [CashFlow]
+sortCashFlows =
+    sortBy (\(_, a) (_, b) -> compare (readAmount a) (readAmount b))
+
