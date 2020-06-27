@@ -39,4 +39,4 @@ unnestString :: String -> String
 unnestString str = [ c | c <- str, c /= '"', c /= '/' ] -- surely there's a more Haskelly way to do a filter or...
 
 toCSV :: [[String]] -> String
-toCSV matrix = unlines (map (intercalate ",") matrix)
+toCSV = unlines . map (intercalate ",")
