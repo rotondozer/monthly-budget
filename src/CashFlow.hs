@@ -19,12 +19,11 @@ where
 -- types are being compared, so it's easier for now to keep them as strings and read the value on demand.
 
 import qualified Data.Map                      as Map
+import qualified Data.Set                      as Set
 
 type Amount = String -- tobe Float
 type Description = String
 type CashFlow = (Description, Amount)
-
-type CashFlowMap = Map.Map Description Amount
 
 readAmount :: Amount -> Float
 readAmount a = read a :: Float
@@ -37,8 +36,13 @@ addToDebsAndCreds cf@(_, amt) (debits : credits : _) = if (readAmount amt) < 0
     then [debits ++ [cf], credits]
     else [debits, credits ++ [cf]]
 
+toList :: CashFlow -> [String]
+toList (debits, credits) = [debits, credits]
+
 -- CashFlowMap
 -- Converting to a map makes the entries unique, and sum duplicate entries
+
+type CashFlowMap = Map.Map Description Amount
 
 toMapWithAmountSum :: [CashFlow] -> CashFlowMap
 toMapWithAmountSum = Map.fromListWith addAmounts
@@ -55,9 +59,6 @@ totalsFromDebsAndCreds (debits : credits : _) =
             totalCredit
             (Map.insert "Total Debits" totalDebit Map.empty)
     in  [debits, credits, Map.insert "NET" (mapTotal totals) totals]
-
-toList :: CashFlow -> [String]
-toList (debits, credits) = [debits, credits]
 
 fromMapsToMatrix :: [CashFlowMap] -> [[String]]
 fromMapsToMatrix [] = []
