@@ -51,13 +51,13 @@ mapTotal :: CashFlowMap -> Amount
 mapTotal = Map.foldl addAmounts "0"
 
 fromMapsToMatrix :: [CashFlowMap] -> [[String]]
-fromMapsToMatrix [] = []
 fromMapsToMatrix (debits : credits : _) =
     let totalCred = mapTotal credits
         totalDeb  = mapTotal debits
-    in  (toSortedList debits)
-            ++ (toSortedList credits)
-            ++ [ ["Total Credits", totalCred]
+    in  (["--- DEBITS ---"] : (toSortedList debits))
+            ++ (["", "-----"] : ["--- CREDITS ---"] : (toSortedList credits))
+            ++ [ ["", "-----"]
+               , ["Total Credits", totalCred]
                , ["Total Debits", totalDeb]
                , ["NET", addAmounts totalCred totalDeb]
                ]
