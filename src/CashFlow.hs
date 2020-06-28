@@ -20,13 +20,15 @@ where
 import qualified Data.Map                      as Map
 import qualified Data.Set                      as Set
 import           Data.List                      ( sortBy )
+import           Data.Maybe                     ( fromMaybe )
+import           Text.Read                      ( readMaybe )
 
 type Amount = String -- tobe Float
 type Description = String
 type CashFlow = (Description, Amount)
 
 readAmount :: Amount -> Float
-readAmount a = read a :: Float
+readAmount a = fromMaybe 0 (readMaybe a)
 
 addAmounts :: Amount -> Amount -> Amount
 addAmounts a1 a2 = show $ (readAmount a1) + (readAmount a2)
