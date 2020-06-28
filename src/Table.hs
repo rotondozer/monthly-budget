@@ -83,6 +83,7 @@ genCsvFile inp = unlines . map csvline $ inp
     csvcells "" = ""
     csvcells c  = '"' : convcell c ++ "\""
     convcell :: String -> String
-    convcell c = concatMap convchar c
+    convcell c = unwords (words (concatMap convchar c))
+    convchar :: Char -> String
     convchar '"' = "\"\""
     convchar x   = [x]
