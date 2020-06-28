@@ -26,8 +26,16 @@ tableToDebitsAndCredits table@(_ : rows) = foldl
     description = getDescription table
 
 getDescription :: Table.Table -> Table.Row -> CashFlow.Description
-getDescription table row =
-    fromMaybe "No Description" (Table.getCell table "Description" row)
+getDescription table row = case (Table.getCell table "Description" row) of
+    Nothing -> "No Description"
+    Just "" -> getTransactionType table row
+    Just d  -> d
 
 getAmount :: Table.Table -> Table.Row -> CashFlow.Amount
 getAmount table row = fromMaybe "0" (Table.getCell table "Amount" row)
+
+getTransactionType :: Table.Table -> Table.Row -> String
+getTransactionType table row =
+    case (Table.getCell table "Transaction Type" row) of
+        Nothing -> "No Transaction Type"
+        Just tt -> tt
