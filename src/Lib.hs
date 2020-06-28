@@ -16,14 +16,17 @@ monthlyBudget =
 
 tableToDebitsAndCredits :: Table.Table -> [[CashFlow.CashFlow]]
 tableToDebitsAndCredits table@(_ : rows) = foldl
-    (\debsAndCreds row ->
-        CashFlow.addToDebsAndCreds (description row, amount row) debsAndCreds
+    (\debsAndCreds row -> if (isTransfer row)
+        then debsAndCreds
+        else CashFlow.addToDebsAndCreds (description row, amount row)
+                                        debsAndCreds
     )
     [[], []]
     rows
   where
     amount      = getAmount table
     description = getDescription table
+    isTransfer row = "TRANSFER" == getTransactionType table row
 
 getDescription :: Table.Table -> Table.Row -> CashFlow.Description
 getDescription table row = case (Table.getCell table "Description" row) of
