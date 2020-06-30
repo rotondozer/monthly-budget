@@ -9,10 +9,10 @@ import qualified CashFlow
 
 monthlyBudget :: String -> String
 monthlyBudget =
-    Table.toCSV . CashFlow.fromMapsToMatrix . sumDebsAndCreds . toDebsAndCreds
+    Table.toCSV . CashFlow.toMatrix . sumDebsAndCreds . toDebsAndCreds
   where
     toDebsAndCreds  = tableToDebitsAndCredits . Table.toTable
-    sumDebsAndCreds = map CashFlow.toMapWithAmountSum
+    sumDebsAndCreds = map CashFlow.toUniqueListWithAmountSum
 
 tableToDebitsAndCredits :: Table.Table -> [[CashFlow.CashFlow]]
 tableToDebitsAndCredits table@(_ : rows) = foldl
@@ -26,7 +26,7 @@ tableToDebitsAndCredits table@(_ : rows) = foldl
   where
     amount      = getAmount table
     description = getDescription table
-    isTransfer row = "TRANSFER" == getTransactionType table row
+    isTransfer r = getTransactionType table r == "TRANSFER"
 
 getDescription :: Table.Table -> Table.Row -> CashFlow.Description
 getDescription table row = case (Table.getCell table "Description" row) of
@@ -34,8 +34,11 @@ getDescription table row = case (Table.getCell table "Description" row) of
     Just "" -> getTransactionType table row
     Just d  -> d
 
+-- TODO: understand how to map over maybes correctly, so I'm not unboxing and reboxing
 getAmount :: Table.Table -> Table.Row -> CashFlow.Amount
-getAmount table row = fromMaybe "0" (Table.getCell table "Amount" row)
+getAmount table row = case (Table.getCell table "Amount" row) of
+    Nothing -> 0
+    Just a  -> CashFlow.readAmount a
 
 getTransactionType :: Table.Table -> Table.Row -> String
 getTransactionType table row =

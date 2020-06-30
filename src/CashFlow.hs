@@ -2,71 +2,59 @@ module CashFlow
     ( Amount
     , Description
     , CashFlow
-    , CashFlowMap
-    , addAmounts
     , addToDebsAndCreds
-    , fromMapsToMatrix
-    , mapTotal
+    , toMatrix
     , readAmount
-    , toMapWithAmountSum
+    , toUniqueListWithAmountSum
     )
 where
 
--- Ideally, Amount would be converted to a Float once and stored that way in the map until
--- it can be converted back to a String. But that creates complications where `fromListWith`
--- needs to handle when it encounters duplicate keys, and at that point, I/Haskell aren't sure which
--- types are being compared, so it's easier for now to keep them as strings and read the value on demand.
-
-import qualified Data.Map                      as Map
-import qualified Data.Set                      as Set
-import           Data.List                      ( sortBy )
+import           Data.List
 import           Data.Maybe                     ( fromMaybe )
 import           Text.Read                      ( readMaybe )
 
-type Amount = String -- tobe Float
+type Amount = Float
 type Description = String
 type CashFlow = (Description, Amount)
 
-readAmount :: Amount -> Float
+readAmount :: String -> Float
 readAmount a = fromMaybe 0 (readMaybe a)
 
-addAmounts :: Amount -> Amount -> Amount
-addAmounts a1 a2 = show $ (readAmount a1) + (readAmount a2)
-
 addToDebsAndCreds :: CashFlow -> [[CashFlow]] -> [[CashFlow]]
-addToDebsAndCreds cf@(_, amt) (debits : credits : _) = if (readAmount amt) < 0
-    then [debits ++ [cf], credits]
-    else [debits, credits ++ [cf]]
+addToDebsAndCreds cf@(_, amt) (debits : credits : _) =
+    if amt < 0 then [debits ++ [cf], credits] else [debits, credits ++ [cf]]
+
+total :: [CashFlow] -> Amount
+total = foldl (\tot (_, amt) -> tot + amt) 0
 
 toList :: CashFlow -> [String]
-toList (debits, credits) = [debits, credits]
+toList (debits, credits) = [debits, show credits]
 
--- CashFlowMap
--- Converting to a map makes the entries unique, and sum duplicate entries
+toUniqueListWithAmountSum :: [CashFlow] -> [CashFlow]
+toUniqueListWithAmountSum = foldl addAmounts []
+  where
+    addAmounts :: [CashFlow] -> CashFlow -> [CashFlow]
+    addAmounts uniqList cf@(desc, amt) = case (lookup desc uniqList) of
+        Nothing -> uniqList ++ [cf]
+        Just amount ->
+            (deleteBy isSameDesc cf uniqList) ++ [(desc, amt + amount)]
+    isSameDesc :: (CashFlow -> CashFlow -> Bool)
+    isSameDesc (desc1, _) (desc2, _) = desc1 == desc2
 
-type CashFlowMap = Map.Map Description Amount
-
-toMapWithAmountSum :: [CashFlow] -> CashFlowMap
-toMapWithAmountSum = Map.fromListWith addAmounts
-
-mapTotal :: CashFlowMap -> Amount
-mapTotal = Map.foldl addAmounts "0"
-
-fromMapsToMatrix :: [CashFlowMap] -> [[String]]
-fromMapsToMatrix (debits : credits : _) =
-    let totalCred = mapTotal credits
-        totalDeb  = mapTotal debits
+toMatrix :: [[CashFlow]] -> [[String]]
+toMatrix (debits : credits : _) =
+    let totalCred = total credits
+        totalDeb  = total debits
     in  (["--- DEBITS ---"] : (toSortedList debits))
             ++ (["", "-----"] : ["--- CREDITS ---"] : (toSortedList credits))
             ++ [ ["", "-----"]
-               , ["Total Credits", totalCred]
-               , ["Total Debits", totalDeb]
-               , ["NET", addAmounts totalCred totalDeb]
+               , ["Total Credits", show totalCred]
+               , ["Total Debits", show totalDeb]
+               , ["NET", show $ totalCred + totalDeb]
                ]
-    where toSortedList = (map toList) . sortCashFlows . Map.toList
+    where toSortedList = (map toList) . sortCashFlows
 
 -- Sort the greater absolute value to be higher, so highest expense and highest credit appear first
 sortCashFlows :: [CashFlow] -> [CashFlow]
-sortCashFlows = sortBy (\(_, a) (_, b) -> compare (absAmount b) (absAmount a))
-    where absAmount = abs . readAmount
+sortCashFlows = sortBy (\(_, a) (_, b) -> compare (abs b) (abs a))
 
