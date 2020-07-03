@@ -7,21 +7,21 @@ import           Data.Maybe                     ( fromMaybe )
 import qualified Table
 import qualified CashFlow
 
-monthlyBudget :: String -> String
-monthlyBudget =
+monthlyBudget :: Float -> String -> String
+monthlyBudget cashDiff =
     Table.toCSV . CashFlow.toMatrix . sumDebsAndCreds . toDebsAndCreds
   where
-    toDebsAndCreds  = tableToDebitsAndCredits . Table.toTable
+    toDebsAndCreds  = (tableToDebitsAndCredits cashDiff) . Table.toTable
     sumDebsAndCreds = map CashFlow.toUniqueListWithAmountSum
 
-tableToDebitsAndCredits :: Table.Table -> [[CashFlow.CashFlow]]
-tableToDebitsAndCredits table@(_ : rows) = foldl
+tableToDebitsAndCredits :: Float -> Table.Table -> [[CashFlow.CashFlow]]
+tableToDebitsAndCredits cashDiff table@(_ : rows) = foldl
     (\debsAndCreds row -> if (isTransfer row)
         then debsAndCreds
         else CashFlow.addToDebsAndCreds (description row, amount row)
                                         debsAndCreds
     )
-    [[], []]
+    (CashFlow.addToDebsAndCreds ("CA$H MONEY", cashDiff) [[], []]) -- TODO: place this with totals for clarity, not really a debit/credit
     rows
   where
     amount      = getAmount table

@@ -9,8 +9,8 @@ main = do
     path     <- getLine
     contents <- readFile path
     cashDiff <- getCashDiff
-    let budget = monthlyBudget contents
-    writeFile "../../Downloads/monthly-budget.csv" budget
+    writeFile "../../Downloads/monthly-budget.csv"
+              (monthlyBudget cashDiff contents)
     print cashDiff
 
 getCashDiff :: IO Float
@@ -23,8 +23,8 @@ getCashDiff = do
   where
     getStartingCash :: IO Float
     getStartingCash = do
-        putStrLn "No info found for cash on-hand to start the month." -- TODO 
-        putStrLn "How much on-hand at the start of this month?"
+        putStrLn "No info found for cash on-hand to start the month..." -- TODO 
+        putStrLn "How much did you have on-hand at the start of this month?"
         sCash <- getLine
         parseCashInput (return, getStartingCash) sCash
 

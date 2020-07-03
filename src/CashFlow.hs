@@ -46,13 +46,15 @@ toMatrix (debits : credits : _) =
     let totalCred = total credits
         totalDeb  = total debits
     in  (["--- DEBITS ---"] : (toSortedList debits))
-            ++ (["", "-----"] : ["--- CREDITS ---"] : (toSortedList credits))
-            ++ [ ["", "-----"]
+            ++ (sectionSeparator : ["--- CREDITS ---"] : (toSortedList credits))
+            ++ [ sectionSeparator
                , ["Total Credits", show totalCred]
                , ["Total Debits", show totalDeb]
                , ["NET", show $ totalCred + totalDeb]
                ]
-    where toSortedList = (map toList) . sortCashFlows
+  where
+    toSortedList     = (map toList) . sortCashFlows
+    sectionSeparator = ["", "----------"]
 
 -- Sort the greater absolute value to be higher, so highest expense and highest credit appear first
 sortCashFlows :: [CashFlow] -> [CashFlow]
