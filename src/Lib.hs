@@ -21,7 +21,7 @@ tableToDebitsAndCredits cashDiff table@(_ : rows) = foldl
         else CashFlow.addToDebsAndCreds (description row, amount row)
                                         debsAndCreds
     )
-    (CashFlow.addToDebsAndCreds ("CA$H MONEY", cashDiff) [[], []]) -- TODO: place this with totals for clarity, not really a debit/credit
+    (CashFlow.addToDebsAndCreds ("CA$H DIFF", cashDiff) [[], []]) -- TODO: place this with totals for clarity, not really a debit/credit
     rows
   where
     amount      = getAmount table

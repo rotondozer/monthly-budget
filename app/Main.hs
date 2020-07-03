@@ -6,12 +6,12 @@ import           Text.Read                      ( readMaybe )
 main :: IO ()
 main = do
     putStrLn "Path to CSV (relative to this program):"
-    path     <- getLine
-    contents <- readFile path
+    contents <- getLine >>= readFile
     cashDiff <- getCashDiff
-    writeFile "../../Downloads/monthly-budget.csv"
-              (monthlyBudget cashDiff contents)
-    print cashDiff
+    let wPath = "../../Downloads/monthly-budget.csv"
+    writeFile wPath $ monthlyBudget cashDiff contents
+    putStrLn $ "Your monthly budget can be found at: " ++ wPath
+    print cashDiff -- Just for dev purposes
 
 getCashDiff :: IO Float
 getCashDiff = do
@@ -24,8 +24,7 @@ getCashDiff = do
     getStartingCash = do
         putStrLn "No info found for cash on-hand to start the month..." -- TODO 
         putStrLn "How much did you have on-hand at the start of this month?"
-        sCash <- getLine
-        parseCashInput (return, getStartingCash) sCash
+        getLine >>= parseCashInput (return, getStartingCash)
 
 parseCashInput :: (Float -> IO Float, IO Float) -> String -> IO Float
 parseCashInput (onSuccess, onFail) cash = case readMaybe cash of
