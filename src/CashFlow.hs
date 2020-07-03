@@ -12,6 +12,7 @@ where
 import           Data.List
 import           Data.Maybe                     ( fromMaybe )
 import           Text.Read                      ( readMaybe )
+import           Text.Printf
 
 type Amount = Float
 type Description = String
@@ -28,7 +29,7 @@ total :: [CashFlow] -> Amount
 total = foldl (\tot (_, amt) -> tot + amt) 0
 
 toList :: CashFlow -> [String]
-toList (debits, credits) = [debits, show credits]
+toList (description, amount) = [description, round2Dec amount]
 
 toUniqueListWithAmountSum :: [CashFlow] -> [CashFlow]
 toUniqueListWithAmountSum = foldl addAmounts []
@@ -48,9 +49,9 @@ toMatrix (debits : credits : _) =
     in  (["--- DEBITS ---"] : (toSortedList debits))
             ++ (sectionSeparator : ["--- CREDITS ---"] : (toSortedList credits))
             ++ [ sectionSeparator
-               , ["Total Credits", show totalCred]
-               , ["Total Debits", show totalDeb]
-               , ["NET", show $ totalCred + totalDeb]
+               , ["Total Credits", round2Dec totalCred]
+               , ["Total Debits", round2Dec totalDeb]
+               , ["NET", round2Dec $ totalCred + totalDeb]
                ]
   where
     toSortedList     = (map toList) . sortCashFlows
@@ -60,3 +61,5 @@ toMatrix (debits : credits : _) =
 sortCashFlows :: [CashFlow] -> [CashFlow]
 sortCashFlows = sortBy (\(_, a) (_, b) -> compare (abs b) (abs a))
 
+round2Dec :: (PrintfArg a, Floating a) => a -> String
+round2Dec = printf "%.2f"
