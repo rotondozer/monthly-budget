@@ -8,19 +8,27 @@ main = do
     putStrLn "Path to CSV (relative to this program):"
     path     <- getLine
     contents <- readFile path
-    -- putStrLn "How much cash on hand at the START of the month?"
-    -- startingCash <- getLine
-    -- putStrLn "How much cash on hand at the END of the month?"
-    -- endingCash <- getLine
-    cash     <- getCashInput
+    cashDiff <- getCashDiff
     let budget = monthlyBudget contents
     writeFile "../../Downloads/monthly-budget.csv" budget
-    print budget
+    print cashDiff
 
-getCashInput :: IO Float
-getCashInput = do
-    putStrLn "How much cash on hand?"
-    startingCash <- getLine
-    case readMaybe startingCash of
-        Nothing  -> putStrLn "Needs to be a number. Try Again." >> getCashInput
-        Just amt -> return amt
+getCashDiff :: IO Float
+getCashDiff = do
+    putStrLn "How much cash on-hand now?"
+    remainingCashInput <- getLine
+    remainingCash <- parseCashInput (return, getCashDiff) remainingCashInput
+    startingCash <- getStartingCash
+    return (startingCash - remainingCash)
+  where
+    getStartingCash :: IO Float
+    getStartingCash = do
+        putStrLn "No info found for cash on-hand to start the month." -- TODO 
+        putStrLn "How much on-hand at the start of this month?"
+        sCash <- getLine
+        parseCashInput (return, getStartingCash) sCash
+
+parseCashInput :: (Float -> IO Float, IO Float) -> String -> IO Float
+parseCashInput (onSuccess, onFail) cash = case readMaybe cash of
+    Nothing  -> putStrLn "Needs to be a number. Try Again." >> onFail
+    Just amt -> onSuccess amt
