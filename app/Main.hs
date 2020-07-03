@@ -16,10 +16,9 @@ main = do
 getCashDiff :: IO Float
 getCashDiff = do
     putStrLn "How much cash on-hand now?"
-    remainingCashInput <- getLine
-    remainingCash <- parseCashInput (return, getCashDiff) remainingCashInput
-    startingCash <- getStartingCash
-    return (startingCash - remainingCash)
+    remainingCash <- getLine >>= parseCashInput (return, getCashDiff)
+    startingCash  <- getStartingCash
+    return (remainingCash - startingCash)
   where
     getStartingCash :: IO Float
     getStartingCash = do
