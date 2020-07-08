@@ -35,10 +35,9 @@ toUniqueListWithAmountSum :: [CashFlow] -> [CashFlow]
 toUniqueListWithAmountSum = foldl addAmounts []
   where
     addAmounts :: [CashFlow] -> CashFlow -> [CashFlow]
-    addAmounts uniqList cf@(desc, amt) = case (lookup desc uniqList) of
-        Nothing -> uniqList ++ [cf]
-        Just amount ->
-            (deleteBy isSameDesc cf uniqList) ++ [(desc, amt + amount)]
+    addAmounts uniqList cf@(desc, amount) = case (lookup desc uniqList) of
+        Nothing  -> uniqList ++ [cf]
+        Just amt -> (deleteBy isSameDesc cf uniqList) ++ [(desc, amt + amount)]
     isSameDesc :: (CashFlow -> CashFlow -> Bool)
     isSameDesc (desc1, _) (desc2, _) = desc1 == desc2
 
