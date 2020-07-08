@@ -16,7 +16,7 @@ main = do
 getCashDiff :: IO Float
 getCashDiff = do
     putStrLn "How much cash on-hand now?"
-    remainingCash <- getLine >>= parseCashInput (return, getCashDiff)
+    remainingCash <- getLine >>= parseCashInputOr getCashDiff
     startingCash  <- getStartingCash
     return (remainingCash - startingCash)
   where
@@ -24,9 +24,8 @@ getCashDiff = do
     getStartingCash = do
         putStrLn "No info found for cash on-hand to start the month..." -- TODO 
         putStrLn "How much did you have on-hand at the start of this month?"
-        getLine >>= parseCashInput (return, getStartingCash)
-
-parseCashInput :: (Float -> IO Float, IO Float) -> String -> IO Float
-parseCashInput (onSuccess, onFail) cash = case readMaybe cash of
-    Nothing  -> putStrLn "Needs to be a number. Try Again." >> onFail
-    Just amt -> onSuccess amt
+        getLine >>= parseCashInputOr getStartingCash
+    parseCashInputOr :: IO Float -> String -> IO Float
+    parseCashInputOr onFail cash = case readMaybe cash of
+        Nothing  -> putStrLn "Needs to be a number. Try Again." >> onFail
+        Just amt -> return amt
