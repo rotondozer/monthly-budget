@@ -19,7 +19,7 @@ The cash flow report is then written as a CSV file, placed in the Downloads fold
 * Make these changes to settings.json:
 ```
     "languageServerHaskell.hieExecutablePath": "~/.local/bin/hie",      //--> ide engine binary 
-    "languageServerHaskell.hlintOn": true,                              //----> so we don't need a linter extension too
-    "languageServerHaskell.trace.server": "messages",                   //---> debugging the IDE I think?
+    "languageServerHaskell.hlintOn": true,                              //--> so we don't need a linter extension too
+    "languageServerHaskell.trace.server": "messages",                   //--> debugging the IDE I think?
  ```
 * I'm sure there was a bunch of other stupid stuff I had to do & figure out that I don't remember.
