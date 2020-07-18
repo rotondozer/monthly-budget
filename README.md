@@ -17,7 +17,9 @@ The cash flow report is then written as a CSV file, placed in the Downloads fold
 * Install `haskell-ide-engine` repo from GH
 * Install `Haskell Syntax Highlighting` and `Haskell Language Server`
 * Make these changes to settings.json:
-    "languageServerHaskell.hieExecutablePath": "~/.local/bin/hie",      //--> the ide engine binary 
-    "languageServerHaskell.hlintOn": true,     ///----> so we don't need a linter extension too
-    "languageServerHaskell.trace.server": "messages",    //---> debugging the IDE I think?
+```
+    "languageServerHaskell.hieExecutablePath": "~/.local/bin/hie",      //--> ide engine binary 
+    "languageServerHaskell.hlintOn": true,                              //----> so we don't need a linter extension too
+    "languageServerHaskell.trace.server": "messages",                   //---> debugging the IDE I think?
+ ```
 * I'm sure there was a bunch of other stupid stuff I had to do & figure out that I don't remember.
