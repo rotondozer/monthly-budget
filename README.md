@@ -1,4 +1,4 @@
-# monthly-budget
+# Monthly Budget
 
 For me, by me, to help me keep track of monthly expenses and how they compare to my income for that month. It'd be cool to make this more general purpose, but I built it to specifically work with the CSV file I can download from my personal bank, which details transactions for a specified time period. 
 
