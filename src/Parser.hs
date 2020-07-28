@@ -4,7 +4,36 @@ module Parser
 where
 
 import           Text.ParserCombinators.Parsec
+import           Data.List.Split                ( splitOn )
+import           Data.Maybe                     ( fromMaybe )
+import           Text.Read                      ( readMaybe )
 
+--          DATE            --
+
+parseMonth :: String -> Maybe String
+parseMonth = intToMonthName . head . sepMDYY
+
+-- "6/2/20" -> [6, 2, 20]
+sepMDYY :: String -> [Maybe Int]
+sepMDYY = map readMaybe . (splitOn "/")
+
+-- 6 -> "June"
+intToMonthName :: Int -> Maybe String
+intToMonthName num | num == 1  = Just "January"
+                   | num == 2  = Just "February"
+                   | num == 3  = Just "March"
+                   | num == 4  = Just "April"
+                   | num == 5  = Just "May"
+                   | num == 6  = Just "June"
+                   | num == 7  = Just "July"
+                   | num == 8  = Just "August"
+                   | num == 9  = Just "September"
+                   | num == 10 = Just "October"
+                   | num == 11 = Just "November"
+                   | num == 12 = Just "December"
+                   | otherwise = Nothing -- lol @ me
+
+--              CSV             --
 -- Begin copypasta --
 -- http://book.realworldhaskell.org/read/using-parsec.html
 

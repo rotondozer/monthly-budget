@@ -8,7 +8,6 @@ module Table
 where
 
 import           Data.List
-import           Data.List.Split                ( splitOneOf )
 import qualified Parser
 
 type Header = String
