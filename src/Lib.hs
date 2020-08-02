@@ -7,11 +7,11 @@ import           Data.Maybe                     ( fromMaybe )
 import qualified Table
 import qualified CashFlow
 
-monthlyBudget :: Float -> String -> String
+monthlyBudget :: Float -> Table.Table -> String
 monthlyBudget cashDiff =
     Table.toCSV . CashFlow.toMatrix . sumDebsAndCreds . toDebsAndCreds
   where
-    toDebsAndCreds  = (tableToDebitsAndCredits cashDiff) . Table.toTable
+    toDebsAndCreds  = tableToDebitsAndCredits cashDiff
     sumDebsAndCreds = map CashFlow.toUniqueListWithAmountSum
 
 tableToDebitsAndCredits :: Float -> Table.Table -> [[CashFlow.CashFlow]]

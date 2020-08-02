@@ -2,15 +2,30 @@ module Main where
 
 import           Lib                            ( monthlyBudget )
 import           Text.Read                      ( readMaybe )
+import qualified Parser
+import qualified Table
+import           Debug.Trace                    ( trace )
 
 main :: IO ()
 main = do
-    putStrLn "Path to CSV (relative to this program):"
-    contents <- getLine >>= readFile
+    table    <- csvToTable
     cashDiff <- getCashDiff
     let wPath = "../../Downloads/monthly-budget.csv"
-    writeFile wPath $ monthlyBudget cashDiff contents
+    writeFile wPath $ monthlyBudget cashDiff table
     putStrLn $ "Your monthly budget can be found at: " ++ wPath
+
+csvToTable :: IO Table.Table
+csvToTable =
+    putStrLn "Path to CSV (relative to this program):"
+        >>  getLine
+        >>= readFile
+        >>= toTable
+  where
+    toTable :: String -> IO Table.Table
+    toTable c = case Parser.parseCSV c of
+        Left e -> trace (show e) putStrLn "Failed reading CSV!" >> csvToTable
+        Right table -> return table
+
 
 getCashDiff :: IO Float
 getCashDiff = do
