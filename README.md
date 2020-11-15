@@ -10,7 +10,7 @@ The cash flow report is then written as a CSV file, placed in the Downloads fold
 
 * Install Haskell platform (this will take a while) to get `stack`, `ghc` and `cabal-install`. I believe I did this with homebrew, but there are a few ways. Start here: https://www.haskell.org/platform/
 * `stack build` from project root to compile
-* `stack exec monthly-budget.exe` from project root to execute the program
+* `stack exec monthly-budget-exe` from project root to execute the program
 
 ## IDE setup for VS CODE
 
