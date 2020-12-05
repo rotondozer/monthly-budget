@@ -1,10 +1,10 @@
 module Main where
 
-import Debug.Trace (trace)
-import Lib (monthlyBudget)
+import           Debug.Trace (trace)
+import           Lib         (monthlyBudget)
 import qualified Parser
 import qualified Table
-import Text.Read (readMaybe)
+import           Text.Read   (readMaybe)
 
 main :: IO ()
 main = do
@@ -23,7 +23,7 @@ csvToTable =
   where
     toTable :: String -> IO Table.Table
     toTable c = case Parser.parseCSV c of
-      Left e -> trace (show e) putStrLn "Failed reading CSV!" >> csvToTable
+      Left e      -> trace (show e) putStrLn "Failed reading CSV!" >> csvToTable
       Right table -> return table
 
 getCashDiff :: IO Float
@@ -39,5 +39,5 @@ getCashDiff = do
       getLine >>= readCashInputOr getStartingCash
     readCashInputOr :: IO Float -> String -> IO Float
     readCashInputOr onFail cash = case readMaybe cash of
-      Nothing -> putStrLn "Needs to be a number. Try Again." >> onFail
+      Nothing  -> putStrLn "Needs to be a number. Try Again." >> onFail
       Just amt -> return amt

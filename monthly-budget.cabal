@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 231fb7b208be29872da00a588d9fc9ccc91313f66b79a5303c8753ef18768dd8
+-- hash: 00cf8b10e9066c29498b0589147ad03790ee0e55711b500b3510f6b12412844c
 
 name:           monthly-budget
 version:        0.1.0.0
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       CashFlow
+      Date
       Lib
       Parser
       Table
