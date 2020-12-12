@@ -38,18 +38,17 @@ getDescription table row = case (Table.getCell table "Description" row) of
   Just "" -> getTransactionType table row
   Just d  -> d
 
--- TODO: understand how to map over maybes correctly, so I'm not unboxing and reboxing
 getAmount :: Table.Table -> Table.Row -> CashFlow.Amount
-getAmount table row = case (Table.getCell table "Amount" row) of
-  Nothing -> 0
-  Just a  -> CashFlow.readAmount a
+getAmount table row =
+  let amt = Table.getCell table "Amount" row
+   in Maybe.maybe 0 CashFlow.readAmount amt
 
 getTransactionType :: Table.Table -> Table.Row -> String
 -- getTransactionType table row = fromMaybe "No Transaction Type" (Table.getCell table "Transaction Type" row)
 getTransactionType = getDate
 
 getDate :: Table.Table -> Table.Row -> String
-getDate table row = fromMaybe "" (Table.getCell table "Date" row)
+getDate table row = Date.convert (Maybe.fromMaybe "" (Table.getCell table "Date" row))
 
 -- getStartAndEndDates :: Table.Table -> Table.Row -> (String, String) -- (StartDate, EndDate) // Does haskell core have a date type with parsing functions?
 -- getStartAndEndDates table row = case Table.getCell table "Date" row of

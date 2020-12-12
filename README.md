@@ -13,10 +13,32 @@ The cash flow report is then written as a CSV file, placed in the Downloads fold
 - `stack build` from project root to compile
 - `stack exec monthly-budget-exe` from project root to execute the program
 
-## IDE setup for VS CODE
+### IDE setup for VS CODE
 
 - Install [the official Haskell extension](https://marketplace.visualstudio.com/items?itemName=haskell.haskell) which comes with the language server and the IDE engine. **Note:** ghc, stack and cabal-install must be installed and on the PATH. _See 'Requirements' section._
 - Install [Haskell Syntax Highlighting extension](https://marketplace.visualstudio.com/items?itemName=justusadam.language-haskell)
+- Go to Settings -> Haskell -> Formatting Provider, and set it to `stylish-haskell`.
+
+Description: VS Code's default dark theme, but just a little bit better.
+VS Marketplace Link:
+
+- Additional [syntax highlighting](https://code.visualstudio.com/api/extension-guides/color-theme#syntax-colors) customization can be done in `settings.json`, e.g.:
+
+```
+"editor.tokenColorCustomizations": {
+    "textMateRules": [
+        {
+            "scope": "meta.function.type-declaration.haskell",
+            "settings": { "fontStyle": "bold", "foreground": "#339e93" }
+        },
+        {
+            "scope": "constant.other.haskell",
+            "settings": { "foreground": "#7fc98f9c" }
+        },
+        { ... }
+    ]
+},
+```
 
 ## Language Documentation
 
