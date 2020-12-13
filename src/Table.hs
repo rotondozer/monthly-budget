@@ -2,14 +2,22 @@ module Table
   ( Row,
     Table,
     toCSV,
+    fromCSV,
     getCell,
+    getColumn,
+    create,
+    addRow,
+    addRow',
+    addSectionSeparator,
   )
 where
 
-import           Data.List
+import Data.List
+import qualified Data.Maybe as Maybe
 import qualified Parser
+import Text.Parsec (ParseError)
 
-type Header = String
+type ColHeader = String
 
 type Row = [String]
 
@@ -24,9 +32,30 @@ type Table = [Row]
 toCSV :: Table -> String
 toCSV = genCsvFile
 
-getCell :: Table -> Header -> Row -> Maybe String
+fromCSV :: String -> Either ParseError Table
+fromCSV = Parser.parseCSV
+
+getCell :: Table -> ColHeader -> Row -> Maybe String
 getCell (headers : _) header row =
   (header `elemIndex` headers) >>= \i -> return (row !! i)
+
+getColumn :: Table -> ColHeader -> [String]
+getColumn t colH = Maybe.mapMaybe getCell' t
+  where
+    getCell' = getCell t colH
+
+create :: [ColHeader] -> Table
+create colHs = [colHs]
+
+-- TODO: guard against adding a row which has a length != table headers length
+addRow :: Table -> Row -> Table
+addRow t r = t ++ [r]
+
+addRow' :: Row -> Table -> Table
+addRow' r t = t ++ [r]
+
+addSectionSeparator :: Table -> Table
+addSectionSeparator t = addRow t ["", "----------"]
 
 -- Other copypasta from Data.CSV --
 -- https://hackage.haskell.org/package/MissingH-1.4.3.0/docs/src/Data.CSV.html#genCsvFile
@@ -38,9 +67,9 @@ genCsvFile = unlines . map csvline
     csvline l = concat . intersperse "," . map csvcells $ l
     csvcells :: String -> String
     csvcells "" = ""
-    csvcells c  = '"' : convcell c ++ "\""
+    csvcells c = '"' : convcell c ++ "\""
     convcell :: String -> String
     convcell c = unwords (words (concatMap convchar c))
     convchar :: Char -> String
     convchar '"' = "\"\""
-    convchar x   = [x]
+    convchar x = [x]

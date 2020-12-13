@@ -4,7 +4,8 @@ module Lib
 where
 
 import qualified CashFlow
-import           Data.Maybe (fromMaybe)
+import qualified Data.Maybe as Maybe
+import qualified Date
 import qualified Table
 
 monthlyBudget :: Float -> Table.Table -> String
@@ -18,7 +19,7 @@ tableToDebitsAndCredits :: Float -> Table.Table -> [[CashFlow.CashFlow]]
 tableToDebitsAndCredits cashDiff table@(_ : rows) =
   foldl
     ( \debsAndCreds row ->
-        if (isTransfer row)
+        if isTransfer row
           then debsAndCreds
           else
             CashFlow.addToDebsAndCreds
@@ -33,10 +34,10 @@ tableToDebitsAndCredits cashDiff table@(_ : rows) =
     isTransfer r = getTransactionType table r == "TRANSFER"
 
 getDescription :: Table.Table -> Table.Row -> CashFlow.Description
-getDescription table row = case (Table.getCell table "Description" row) of
+getDescription table row = case Table.getCell table "Description" row of
   Nothing -> "No Description"
   Just "" -> getTransactionType table row
-  Just d  -> d
+  Just d -> d
 
 getAmount :: Table.Table -> Table.Row -> CashFlow.Amount
 getAmount table row =
@@ -44,17 +45,7 @@ getAmount table row =
    in Maybe.maybe 0 CashFlow.readAmount amt
 
 getTransactionType :: Table.Table -> Table.Row -> String
--- getTransactionType table row = fromMaybe "No Transaction Type" (Table.getCell table "Transaction Type" row)
-getTransactionType = getDate
+getTransactionType table row = Maybe.fromMaybe "No Transaction Type" (Table.getCell table "Transaction Type" row)
 
-getDate :: Table.Table -> Table.Row -> String
-getDate table row = Date.convert (Maybe.fromMaybe "" (Table.getCell table "Date" row))
-
--- getStartAndEndDates :: Table.Table -> Table.Row -> (String, String) -- (StartDate, EndDate) // Does haskell core have a date type with parsing functions?
--- getStartAndEndDates table row = case Table.getCell table "Date" row of
---   Nothing -> ("No date", "No Date")
---   Just d -> (Date.convert d, Date.convert d)
-
--- Get list of dates as raw string values from the csv
--- Assume they are ordered chronologically, get the first and last entry
--- Is there a Date library to do the parsing? If not, how to do the thing?
+getDates :: Table.Table -> (String, String)
+getDates t = Date.getStartAndEndDates $ Table.getColumn t "Date"

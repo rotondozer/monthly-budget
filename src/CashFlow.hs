@@ -1,17 +1,19 @@
-module CashFlow (
-  Amount,
-  Description,
-  CashFlow,
-  addToDebsAndCreds,
-  toMatrix,
-  readAmount,
-  toUniqueListWithAmountSum,
-) where
+module CashFlow
+  ( Amount,
+    Description,
+    CashFlow,
+    addToDebsAndCreds,
+    toMatrix,
+    readAmount,
+    toUniqueListWithAmountSum,
+  )
+where
 
-import           Data.List
-import           Data.Maybe  (fromMaybe)
-import           Text.Printf
-import           Text.Read   (readMaybe)
+import Data.List
+import Data.Maybe (fromMaybe)
+import Table
+import Text.Printf
+import Text.Read (readMaybe)
 
 type Amount = Float
 
@@ -34,13 +36,13 @@ toList (description, amount) = [description, round2Dec amount]
 
 toUniqueListWithAmountSum :: [CashFlow] -> [CashFlow]
 toUniqueListWithAmountSum = foldl addAmounts []
- where
-  addAmounts :: [CashFlow] -> CashFlow -> [CashFlow]
-  addAmounts uniqList cf@(desc, amount) = case (lookup desc uniqList) of
-    Nothing  -> uniqList ++ [cf]
-    Just amt -> (deleteBy isSameDesc cf uniqList) ++ [(desc, amt + amount)]
-  isSameDesc :: (CashFlow -> CashFlow -> Bool)
-  isSameDesc (desc1, _) (desc2, _) = desc1 == desc2
+  where
+    addAmounts :: [CashFlow] -> CashFlow -> [CashFlow]
+    addAmounts uniqList cf@(desc, amount) = case (lookup desc uniqList) of
+      Nothing -> uniqList ++ [cf]
+      Just amt -> (deleteBy isSameDesc cf uniqList) ++ [(desc, amt + amount)]
+    isSameDesc :: (CashFlow -> CashFlow -> Bool)
+    isSameDesc (desc1, _) (desc2, _) = desc1 == desc2
 
 toMatrix :: [[CashFlow]] -> [[String]]
 toMatrix (debits : credits : _) =
@@ -48,14 +50,29 @@ toMatrix (debits : credits : _) =
       totalDeb = total debits
    in (["--- DEBITS ---"] : (toSortedList debits))
         ++ (sectionSeparator : ["--- CREDITS ---"] : (toSortedList credits))
-        ++ [ sectionSeparator
-           , ["Total Credits", round2Dec totalCred]
-           , ["Total Debits", round2Dec totalDeb]
-           , ["NET", round2Dec $ totalCred + totalDeb]
+        ++ [ sectionSeparator,
+             ["Total Credits", round2Dec totalCred],
+             ["Total Debits", round2Dec totalDeb],
+             ["NET", round2Dec $ totalCred + totalDeb]
            ]
- where
-  toSortedList = (map toList) . sortCashFlows
-  sectionSeparator = ["", "----------"]
+  where
+    toSortedList = map toList . sortCashFlows
+    sectionSeparator = ["", "----------"]
+
+toMatrix' :: [[CashFlow]] -> Table
+toMatrix' (debits : credits : _) =
+  let totalCred = total credits
+      totalDeb = total debits
+      t = create ["Grouped Transactions", "Net"]
+      t2 :: Table
+      t2 = addRow' ["--- DEBITS ---", ""] t ++ toSortedList debits ++ [sectionSeparator]
+      t3 :: Table
+      t3 = addRow' ["--- CREDITS ---"] t2 ++ toSortedList credits ++ [sectionSeparator]
+   in addRow' ["NET", round2Dec $ totalCred + totalDeb] (addRow' ["Total Credits", round2Dec totalCred] (addRow' ["Total Debits", round2Dec totalDeb] (addRow' ["Total Debits", round2Dec totalDeb] t3)))
+  where
+    toSortedList :: [CashFlow] -> Table
+    toSortedList = map toList . sortCashFlows
+    sectionSeparator = ["", "----------"]
 
 -- Sort the greater absolute value to be higher, so highest expense and highest credit appear first
 sortCashFlows :: [CashFlow] -> [CashFlow]
