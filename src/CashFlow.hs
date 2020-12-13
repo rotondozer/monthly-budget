@@ -4,6 +4,7 @@ module CashFlow
     CashFlow,
     addToDebsAndCreds,
     toMatrix,
+    toMatrix',
     readAmount,
     toUniqueListWithAmountSum,
   )
@@ -11,7 +12,7 @@ where
 
 import Data.List
 import Data.Maybe (fromMaybe)
-import Table
+import qualified Table
 import Text.Printf
 import Text.Read (readMaybe)
 
@@ -59,20 +60,24 @@ toMatrix (debits : credits : _) =
     toSortedList = map toList . sortCashFlows
     sectionSeparator = ["", "----------"]
 
-toMatrix' :: [[CashFlow]] -> Table
+toMatrix' :: [[CashFlow]] -> Table.Table
 toMatrix' (debits : credits : _) =
-  let totalCred = total credits
-      totalDeb = total debits
-      t = create ["Grouped Transactions", "Net"]
-      t2 :: Table
-      t2 = addRow' ["--- DEBITS ---", ""] t ++ toSortedList debits ++ [sectionSeparator]
-      t3 :: Table
-      t3 = addRow' ["--- CREDITS ---"] t2 ++ toSortedList credits ++ [sectionSeparator]
-   in addRow' ["NET", round2Dec $ totalCred + totalDeb] (addRow' ["Total Credits", round2Dec totalCred] (addRow' ["Total Debits", round2Dec totalDeb] (addRow' ["Total Debits", round2Dec totalDeb] t3)))
+  ( Table.addRow' ["NET", round2Dec $ total credits + total debits]
+      . Table.addRow' ["Total Credits", round2Dec (total credits)]
+      . Table.addRow' ["Total Debits", round2Dec (total debits)]
+      . (++ toTableSection credits)
+      . Table.addSectionSeparator
+      . Table.addRow' ["--- CREDITS ---"]
+      . (++ toTableSection debits)
+      . Table.addSectionSeparator
+      . Table.addRow' ["--- DEBITS ---", ""]
+  )
+    ( Table.create
+        ["Grouped Transactions", "Net"]
+    )
   where
-    toSortedList :: [CashFlow] -> Table
-    toSortedList = map toList . sortCashFlows
-    sectionSeparator = ["", "----------"]
+    toTableSection :: [CashFlow] -> Table.Table
+    toTableSection = map toList . sortCashFlows
 
 -- Sort the greater absolute value to be higher, so highest expense and highest credit appear first
 sortCashFlows :: [CashFlow] -> [CashFlow]
