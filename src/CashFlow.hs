@@ -4,7 +4,6 @@ module CashFlow
     CashFlow,
     addToDebsAndCreds,
     toMatrix,
-    toMatrix',
     readAmount,
     toUniqueListWithAmountSum,
   )
@@ -45,35 +44,22 @@ toUniqueListWithAmountSum = foldl addAmounts []
     isSameDesc :: (CashFlow -> CashFlow -> Bool)
     isSameDesc (desc1, _) (desc2, _) = desc1 == desc2
 
-toMatrix :: [[CashFlow]] -> [[String]]
+toMatrix :: [[CashFlow]] -> Table.Table
 toMatrix (debits : credits : _) =
-  let totalCred = total credits
-      totalDeb = total debits
-   in (["--- DEBITS ---"] : (toSortedList debits))
-        ++ (sectionSeparator : ["--- CREDITS ---"] : (toSortedList credits))
-        ++ [ sectionSeparator,
-             ["Total Credits", round2Dec totalCred],
-             ["Total Debits", round2Dec totalDeb],
-             ["NET", round2Dec $ totalCred + totalDeb]
-           ]
-  where
-    toSortedList = map toList . sortCashFlows
-    sectionSeparator = ["", "----------"]
-
-toMatrix' :: [[CashFlow]] -> Table.Table
-toMatrix' (debits : credits : _) =
-  ( Table.addRow' ["NET", round2Dec $ total credits + total debits]
-      . Table.addRow' ["Total Credits", round2Dec (total credits)]
-      . Table.addRow' ["Total Debits", round2Dec (total debits)]
+  ( Table.addRow ["NET", round2Dec $ total credits + total debits]
+      . Table.rowSpacer
+      . Table.addRow ["Total Credits", round2Dec (total credits)]
+      . Table.addSectionSeparator
       . (++ toTableSection credits)
+      . Table.addRow ["------ CREDITS ------", ""]
+      . Table.rowSpacer
+      . Table.addRow ["Total Debits", round2Dec (total debits)]
       . Table.addSectionSeparator
-      . Table.addRow' ["--- CREDITS ---"]
       . (++ toTableSection debits)
-      . Table.addSectionSeparator
-      . Table.addRow' ["--- DEBITS ---", ""]
+      . Table.addRow ["------ DEBITS ------", ""]
   )
     ( Table.create
-        ["Grouped Transactions", "Net"]
+        ["Grouped Transactions", "Amount"]
     )
   where
     toTableSection :: [CashFlow] -> Table.Table

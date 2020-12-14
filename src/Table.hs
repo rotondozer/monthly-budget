@@ -7,7 +7,7 @@ module Table
     getColumn,
     create,
     addRow,
-    addRow',
+    rowSpacer,
     addSectionSeparator,
   )
 where
@@ -48,14 +48,16 @@ create :: [ColHeader] -> Table
 create colHs = [colHs]
 
 -- TODO: guard against adding a row which has a length != table headers length
-addRow :: Table -> Row -> Table
-addRow t r = t ++ [r]
+addRow :: Row -> Table -> Table
+addRow r t = t ++ [r]
 
-addRow' :: Row -> Table -> Table
-addRow' r t = t ++ [r]
-
+-- TODO: make this configurable
 addSectionSeparator :: Table -> Table
-addSectionSeparator t = addRow t ["", "----------"]
+addSectionSeparator = addRow ["", "----------"]
+
+-- TODO: make this configurable for the Table's num of columns
+rowSpacer :: Table -> Table
+rowSpacer = addRow ["", ""]
 
 -- Other copypasta from Data.CSV --
 -- https://hackage.haskell.org/package/MissingH-1.4.3.0/docs/src/Data.CSV.html#genCsvFile
