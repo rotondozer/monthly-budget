@@ -40,7 +40,7 @@ getCell (headers : _) header row =
   (header `elemIndex` headers) >>= \i -> return (row !! i)
 
 getColumn :: Table -> ColHeader -> [String]
-getColumn t colH = Maybe.mapMaybe getCell' t
+getColumn t colH = tail (Maybe.mapMaybe getCell' t)
   where
     getCell' = getCell t colH
 

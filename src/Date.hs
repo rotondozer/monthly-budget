@@ -1,11 +1,14 @@
-module Date (toLongDate, getStartAndEndDates) where
+module Date (toLongDate, getMonths, getStartAndEndDates) where
 
+import Data.List (sort)
 import Data.List.Split (linesBy)
 import Data.Maybe (fromMaybe)
-import qualified Debug.Trace as Debug
+import qualified Data.Set as Set
 import Text.Read (readMaybe)
 
-months :: [String]
+type Month = String
+
+months :: [Month]
 months =
   [ "january",
     "february",
@@ -25,15 +28,25 @@ type CSVDate = String -- "4/13/19"
 
 type RawDate = Int -- 20190413
 
+type DateTriple = (Int, Int, Int) -- (YYYY, MM, DD)
+
 -- | "4/13/19" -> "April 13, 2019"
 toLongDate :: CSVDate -> String
-toLongDate = gettem . toYDMList
+toLongDate = gettem . toYMDList
   where
     gettem :: [String] -> String
-    gettem (y : d : m : _) = getMonth m ++ " " ++ d ++ ", 20" ++ y
+    gettem (y : m : d : _) = getMonth (readInt m) ++ " " ++ d ++ ", 20" ++ y
 
-getStartAndEndDates :: [CSVDate] -> (String, String)
-getStartAndEndDates dates = (toLongDate $ head dates, toLongDate $ last dates) -- assume they're already sorted, for now
+getStartAndEndDates :: [CSVDate] -> (CSVDate, CSVDate)
+getStartAndEndDates dates =
+  let sortedDates = sortAsRawDates dates
+   in (fromDateToCSVDate $ head sortedDates, fromDateToCSVDate $ last sortedDates)
+
+getMonths :: [CSVDate] -> [String]
+getMonths ds =
+  let dtrips = map (fromDateToTriple . toDateFromCSVDate) ds
+      months = map (\(_, m, __) -> getMonth m) dtrips
+   in Set.toList (Set.fromList months)
 
 ------ SORTING -------
 -- Convert dates into 8 digit representations that can be easily sorted
@@ -51,25 +64,37 @@ getStartAndEndDates dates = (toLongDate $ head dates, toLongDate $ last dates) -
 
 --    PRIVATE
 
+fromDateToTriple :: RawDate -> DateTriple
+fromDateToTriple date =
+  let (y : m : d : _) = map readInt (fromDateToYMDList date)
+   in (y, m, d)
+
 -- | 20200413 -> "04/13/2020"
--- fromDateToCSVDate :: RawDate -> CSVDate
--- fromDateToCSVDate = fromDateToYDMList
+fromDateToCSVDate :: RawDate -> CSVDate
+fromDateToCSVDate = fromYMDListToCSVDate . fromDateToYMDList
+
+-- | ["2020", "04", "13"] -> "04/13/2020"
+fromYMDListToCSVDate :: [String] -> CSVDate
+fromYMDListToCSVDate (y : m : d : _) = d ++ "/" ++ m ++ "/" ++ y
 
 -- | 20200413 -> ["2020", "04", "13"]
-fromDateToYDMList :: RawDate -> [String]
-fromDateToYDMList int = [show int]
+fromDateToYMDList :: RawDate -> [String]
+fromDateToYMDList int =
+  let (y, md) = splitAt 4 (show int)
+      (m, d) = splitAt 2 md
+   in [y, m, d]
 
 -- | ["4/13/2020", "4/12/2020"] -> [20200412, 20200413]
-sortie :: [CSVDate] -> [RawDate]
-sortie = map toDateFromCSVDate
+sortAsRawDates :: [CSVDate] -> [RawDate]
+sortAsRawDates = sort . map toDateFromCSVDate
 
 -- | "4/13/2020" -> 20200413
 toDateFromCSVDate :: CSVDate -> RawDate
-toDateFromCSVDate = toDateFromYDMList . toYDMList
+toDateFromCSVDate = toDateFromYMDList . toYMDList
 
--- | ["4", "13" , "2020"] -> 20200413
-toDateFromYDMList :: [String] -> RawDate
-toDateFromYDMList (y : m : d : _) = read (y ++ padZero m ++ padZero d)
+-- | ["20", "4", "13"] -> 20200413
+toDateFromYMDList :: [String] -> RawDate
+toDateFromYMDList (y : m : d : _) = read ("20" ++ y ++ padZero m ++ padZero d)
 
 -- TODO: look into less type conversion, if possible.
 
@@ -80,18 +105,19 @@ toDateFromYDMList (y : m : d : _) = read (y ++ padZero m ++ padZero d)
 -- | If an Int cannot be parsed, it will resolve to "00".
 padZero :: String -> String
 padZero str
-  | readInt str > 10 = str
+  | readInt str > 9 = str
   | otherwise = "0" ++ str
 
--- | "4/13/2020" -> ["4", "13", "2020"]
-toYDMList :: CSVDate -> [String]
-toYDMList = reverse . linesBy (== '/')
+-- | "4/13/20" -> ["20", "4", "13"]
+toYMDList :: CSVDate -> [String]
+toYMDList d = toThing (linesBy (== '/') d)
+  where
+    toThing :: [String] -> [String]
+    toThing (m : d : y : _) = [y, m, d]
 
 -- Take a Month number and get the string
-getMonth :: String -> String
-getMonth numStr = months !! (readInt numStr - 1)
+getMonth :: Int -> String
+getMonth int = months !! (int - 1)
 
 readInt :: String -> Int
 readInt str = fromMaybe 0 (readMaybe str)
-
-debugAndReturn x = Debug.trace ("DEBUGGER: " ++ show x) x
