@@ -47,9 +47,10 @@ getColumn t colH = Maybe.mapMaybe getCell' t
 create :: [ColHeader] -> Table
 create colHs = [colHs]
 
--- TODO: guard against adding a row which has a length != table headers length
 addRow :: Row -> Table -> Table
-addRow r t = t ++ [r]
+addRow r t
+  | length t /= length r = t
+  | otherwise = t ++ [r]
 
 -- TODO: make this configurable
 addSectionSeparator :: Table -> Table
