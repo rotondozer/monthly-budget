@@ -1,17 +1,27 @@
 module Table
-  ( Row
-  , Table
-  , toCSV
-  , getCell
+  ( Row,
+    Table,
+    toCSV,
+    fromCSV,
+    getCell,
+    getColumn,
+    create,
+    addRow,
+    rowSpacer,
+    addSectionSeparator,
   )
 where
 
-import           Data.List
-import           Data.List.Split                ( splitOneOf )
+import Data.List
+import qualified Data.Maybe as Maybe
 import qualified Parser
+import Text.Parsec (ParseError)
+import qualified Util
 
-type Header = String
+type ColHeader = String
+
 type Row = [String]
+
 type Table = [Row]
 
 -- CSV -> Table
@@ -23,23 +33,47 @@ type Table = [Row]
 toCSV :: Table -> String
 toCSV = genCsvFile
 
-getCell :: Table -> Header -> Row -> Maybe String
-getCell (headers : rows) header row =
+fromCSV :: String -> Either ParseError Table
+fromCSV = Parser.parseCSV
+
+getCell :: Table -> ColHeader -> Row -> Maybe String
+getCell (headers : _) header row =
   (header `elemIndex` headers) >>= \i -> return (row !! i)
 
--- Other copypasta from Data.CSV -- 
+getColumn :: Table -> ColHeader -> [String]
+getColumn t colH = tail (Maybe.mapMaybe getCell' t)
+  where
+    getCell' = getCell t colH
+
+create :: [ColHeader] -> Table
+create colHs = [colHs]
+
+addRow :: Row -> Table -> Table
+addRow r t
+  | length (head t) /= length r = Util.logWarn t
+  | otherwise = t ++ [r]
+
+-- TODO: make this configurable
+addSectionSeparator :: Table -> Table
+addSectionSeparator = addRow ["", "----------"]
+
+-- TODO: make this configurable for the Table's num of columns
+rowSpacer :: Table -> Table
+rowSpacer = addRow ["", ""]
+
+-- Other copypasta from Data.CSV --
 -- https://hackage.haskell.org/package/MissingH-1.4.3.0/docs/src/Data.CSV.html#genCsvFile
 
 genCsvFile :: [[String]] -> String
-genCsvFile inp = unlines . map csvline $ inp
- where
-  csvline :: [String] -> String
-  csvline l = concat . intersperse "," . map csvcells $ l
-  csvcells :: String -> String
-  csvcells "" = ""
-  csvcells c  = '"' : convcell c ++ "\""
-  convcell :: String -> String
-  convcell c = unwords (words (concatMap convchar c))
-  convchar :: Char -> String
-  convchar '"' = "\"\""
-  convchar x   = [x]
+genCsvFile = unlines . map csvline
+  where
+    csvline :: [String] -> String
+    csvline l = concat . intersperse "," . map csvcells $ l
+    csvcells :: String -> String
+    csvcells "" = ""
+    csvcells c = '"' : convcell c ++ "\""
+    convcell :: String -> String
+    convcell c = unwords (words (concatMap convchar c))
+    convchar :: Char -> String
+    convchar '"' = "\"\""
+    convchar x = [x]

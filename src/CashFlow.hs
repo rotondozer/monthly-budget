@@ -11,6 +11,8 @@ where
 
 import Data.List
 import Data.Maybe (fromMaybe)
+import qualified Date
+import qualified Table
 import Text.Printf
 import Text.Read (readMaybe)
 
@@ -43,20 +45,26 @@ toUniqueListWithAmountSum = foldl addAmounts []
     isSameDesc :: (CashFlow -> CashFlow -> Bool)
     isSameDesc (desc1, _) (desc2, _) = desc1 == desc2
 
-toMatrix :: [[CashFlow]] -> [[String]]
+toMatrix :: [[CashFlow]] -> Table.Table
 toMatrix (debits : credits : _) =
-  let totalCred = total credits
-      totalDeb = total debits
-   in (["--- DEBITS ---"] : (toSortedList debits))
-        ++ (sectionSeparator : ["--- CREDITS ---"] : (toSortedList credits))
-        ++ [ sectionSeparator,
-             ["Total Credits", round2Dec totalCred],
-             ["Total Debits", round2Dec totalDeb],
-             ["NET", round2Dec $ totalCred + totalDeb]
-           ]
+  ( Table.addRow ["NET", round2Dec $ total credits + total debits]
+      . Table.rowSpacer
+      . Table.addRow ["Total Credits", round2Dec (total credits)]
+      . Table.addSectionSeparator
+      . (++ toTableSection credits)
+      . Table.addRow ["------ CREDITS ------", ""]
+      . Table.rowSpacer
+      . Table.addRow ["Total Debits", round2Dec (total debits)]
+      . Table.addSectionSeparator
+      . (++ toTableSection debits)
+      . Table.addRow ["------ DEBITS ------", ""]
+  )
+    ( Table.create
+        ["Grouped Transactions", "Amount"]
+    )
   where
-    toSortedList = (map toList) . sortCashFlows
-    sectionSeparator = ["", "----------"]
+    toTableSection :: [CashFlow] -> Table.Table
+    toTableSection = map toList . sortCashFlows
 
 -- Sort the greater absolute value to be higher, so highest expense and highest credit appear first
 sortCashFlows :: [CashFlow] -> [CashFlow]

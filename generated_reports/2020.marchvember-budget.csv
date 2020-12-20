@@ -1,0 +1,19 @@
+"Grouped Transactions","Amount"
+"------ DEBITS ------",
+"MASTER EXPRESS CREDIT PMT","-70.44"
+"VENMO PAYMENT","-5.00"
+"HONDOYA LEASE_PAY","-199.99"
+"MY STDNT LOAN","836.69"
+"THEONLYELECTRICCOMPANY","-49.50"
+"COMIZON CABLE INTERNT","-131.02"
+,"----------"
+"Total Debits","-1292.64"
+,
+"------ CREDITS ------",
+"MYJOB, CO.,"420.00"
+"DEPOSIT","200.30"
+"CA$H DIFF","150.00"
+,"----------"
+"Total Credits","770.30"
+,
+"NET","-522.34"
