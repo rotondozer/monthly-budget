@@ -45,7 +45,7 @@ getStartAndEndDates dates =
 getMonths :: [CSVDate] -> [String]
 getMonths ds =
   let dtrips = map (fromDateToTriple . toDateFromCSVDate) ds
-      months = map (\(_, m, __) -> getMonth m) dtrips
+      months = map (getMonth . getM) dtrips
    in Set.toList (Set.fromList months)
 
 ------ SORTING -------
@@ -63,6 +63,12 @@ getMonths ds =
 -- 6. Use these as the basic Date structure, to then convert to whatever form...?
 
 --    PRIVATE
+
+getM :: DateTriple -> Int
+getM (_, m, __) = m
+
+getY :: DateTriple -> Int
+getY (_, __, y) = y
 
 fromDateToTriple :: RawDate -> DateTriple
 fromDateToTriple date =
