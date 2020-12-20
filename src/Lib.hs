@@ -47,5 +47,5 @@ getAmount table row =
 getTransactionType :: Table.Table -> Table.Row -> String
 getTransactionType table row = Maybe.fromMaybe "No Transaction Type" (Table.getCell table "Transaction Type" row)
 
-getDates :: Table.Table -> (String, String)
-getDates t = Date.getStartAndEndDates $ Table.getColumn t "Date"
+-- getDates :: Table.Table -> (String, String)
+-- getDates t = Date.getRange $ Table.getColumn t "Date"

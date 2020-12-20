@@ -1,4 +1,4 @@
-module Date (toLongDate, getMonths, getStartAndEndDates) where
+module Date (toLongDate, getMonths, getYears, getRange) where
 
 import Data.List (sort)
 import Data.List.Split (linesBy)
@@ -30,23 +30,33 @@ type RawDate = Int -- 20190413
 
 type DateTriple = (Int, Int, Int) -- (YYYY, MM, DD)
 
+type YMDList = [String] -- ["20", "4", "13"]
+
 -- | "4/13/19" -> "April 13, 2019"
 toLongDate :: CSVDate -> String
 toLongDate = gettem . toYMDList
   where
     gettem :: [String] -> String
-    gettem (y : m : d : _) = getMonth (readInt m) ++ " " ++ d ++ ", 20" ++ y
+    gettem (y : m : d : _) = getLongMonth (readInt m) ++ " " ++ d ++ ", " ++ pad20 y
 
-getStartAndEndDates :: [CSVDate] -> (CSVDate, CSVDate)
-getStartAndEndDates dates =
+getRange :: [CSVDate] -> (CSVDate, CSVDate)
+getRange dates =
   let sortedDates = sortAsRawDates dates
    in (fromDateToCSVDate $ head sortedDates, fromDateToCSVDate $ last sortedDates)
 
+-- This is making the assumption we won't have a CSV report that can include the same month
+-- from more than one year. Since this is 'monthly-budget', we're assuming we're dealing with
+-- a few months at most.
 getMonths :: [CSVDate] -> [String]
 getMonths ds =
   let dtrips = map (fromDateToTriple . toDateFromCSVDate) ds
-      months = map (getMonth . getM) dtrips
-   in Set.toList (Set.fromList months)
+   in uniq (map (getLongMonth . getM) dtrips)
+
+-- | ["4/13/20", "4/12/20", "4/13/21"] -> ["2020", "2021"]
+getYears :: [CSVDate] -> [String]
+getYears ds =
+  let dtrips = map (fromDateToTriple . toDateFromCSVDate) ds
+   in uniq (map (pad20 . show . getY) dtrips)
 
 ------ SORTING -------
 -- Convert dates into 8 digit representations that can be easily sorted
@@ -68,7 +78,10 @@ getM :: DateTriple -> Int
 getM (_, m, __) = m
 
 getY :: DateTriple -> Int
-getY (_, __, y) = y
+getY (y, _, __) = y
+
+getD :: DateTriple -> Int
+getD (_, __, d) = d
 
 fromDateToTriple :: RawDate -> DateTriple
 fromDateToTriple date =
@@ -79,12 +92,12 @@ fromDateToTriple date =
 fromDateToCSVDate :: RawDate -> CSVDate
 fromDateToCSVDate = fromYMDListToCSVDate . fromDateToYMDList
 
--- | ["2020", "04", "13"] -> "04/13/2020"
-fromYMDListToCSVDate :: [String] -> CSVDate
+-- | ["20", "4", "13"] -> "4/13/2020"
+fromYMDListToCSVDate :: YMDList -> CSVDate
 fromYMDListToCSVDate (y : m : d : _) = d ++ "/" ++ m ++ "/" ++ y
 
 -- | 20200413 -> ["2020", "04", "13"]
-fromDateToYMDList :: RawDate -> [String]
+fromDateToYMDList :: RawDate -> YMDList
 fromDateToYMDList int =
   let (y, md) = splitAt 4 (show int)
       (m, d) = splitAt 2 md
@@ -99,8 +112,8 @@ toDateFromCSVDate :: CSVDate -> RawDate
 toDateFromCSVDate = toDateFromYMDList . toYMDList
 
 -- | ["20", "4", "13"] -> 20200413
-toDateFromYMDList :: [String] -> RawDate
-toDateFromYMDList (y : m : d : _) = read ("20" ++ y ++ padZero m ++ padZero d)
+toDateFromYMDList :: YMDList -> RawDate
+toDateFromYMDList (y : m : d : _) = read (pad20 y ++ padZero m ++ padZero d)
 
 -- TODO: look into less type conversion, if possible.
 
@@ -114,16 +127,27 @@ padZero str
   | readInt str > 9 = str
   | otherwise = "0" ++ str
 
+-- specific for years. Should rename?
+pad20 :: String -> String
+pad20 str
+  | length str == 4 = str
+  | length str == 2 = "20" ++ str
+  | otherwise = "0000"
+
 -- | "4/13/20" -> ["20", "4", "13"]
-toYMDList :: CSVDate -> [String]
-toYMDList d = toThing (linesBy (== '/') d)
+toYMDList :: CSVDate -> YMDList
+toYMDList d = fromMDYtoYMD (linesBy (== '/') d)
   where
-    toThing :: [String] -> [String]
-    toThing (m : d : y : _) = [y, m, d]
+    fromMDYtoYMD :: [String] -> [String]
+    fromMDYtoYMD (m : d : y : _) = [y, m, d]
 
 -- Take a Month number and get the string
-getMonth :: Int -> String
-getMonth int = months !! (int - 1)
+-- TODO: safely access the List
+getLongMonth :: Int -> String
+getLongMonth int = months !! (int - 1)
 
 readInt :: String -> Int
 readInt str = fromMaybe 0 (readMaybe str)
+
+uniq :: Ord a => [a] -> [a]
+uniq = Set.toList . Set.fromList -- prob not the most efficient

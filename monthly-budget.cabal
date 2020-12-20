@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 00cf8b10e9066c29498b0589147ad03790ee0e55711b500b3510f6b12412844c
+-- hash: f99c4a3f3d252b1d77649e9fbc5baac42fa7978ad40392f65dc21ba212fc8c28
 
 name:           monthly-budget
 version:        0.1.0.0
@@ -32,6 +32,7 @@ library
       Lib
       Parser
       Table
+      Util
   other-modules:
       Paths_monthly_budget
   hs-source-dirs:

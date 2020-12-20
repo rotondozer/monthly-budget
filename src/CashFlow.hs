@@ -11,8 +11,8 @@ where
 
 import Data.List
 import Data.Maybe (fromMaybe)
-import qualified Table
 import qualified Date
+import qualified Table
 import Text.Printf
 import Text.Read (readMaybe)
 
@@ -58,8 +58,6 @@ toMatrix (debits : credits : _) =
       . Table.addSectionSeparator
       . (++ toTableSection debits)
       . Table.addRow ["------ DEBITS ------", ""]
-      . Table.addSectionSeparator
-      . Table.addRow ["--- dates go here ----", ""]
   )
     ( Table.create
         ["Grouped Transactions", "Amount"]

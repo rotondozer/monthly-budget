@@ -16,6 +16,7 @@ import Data.List
 import qualified Data.Maybe as Maybe
 import qualified Parser
 import Text.Parsec (ParseError)
+import qualified Util
 
 type ColHeader = String
 
@@ -49,7 +50,7 @@ create colHs = [colHs]
 
 addRow :: Row -> Table -> Table
 addRow r t
-  | length t /= length r = t
+  | length (head t) /= length r = Util.logWarn t
   | otherwise = t ++ [r]
 
 -- TODO: make this configurable

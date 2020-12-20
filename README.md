@@ -17,7 +17,6 @@ The cash flow report is then written as a CSV file, placed in the Downloads fold
 
 - Install [the official Haskell extension](https://marketplace.visualstudio.com/items?itemName=haskell.haskell) which comes with the language server and the IDE engine. **Note:** ghc, stack and cabal-install must be installed and on the PATH. _See 'Requirements' section._
 - Install [Haskell Syntax Highlighting extension](https://marketplace.visualstudio.com/items?itemName=justusadam.language-haskell)
-- Go to Settings -> Haskell -> Formatting Provider, and set it to `stylish-haskell`.
 
 Description: VS Code's default dark theme, but just a little bit better.
 VS Marketplace Link:

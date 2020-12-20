@@ -9,9 +9,9 @@ import Text.Read (readMaybe)
 main :: IO ()
 main = do
   table <- csvToTable
+  let ds = Table.getColumn table "Date"
+  let wPath = "./generated_reports/" ++ yearPrefix (Date.getYears ds) ++ "." ++ path (Date.getMonths ds)
   cashDiff <- getCashDiff
-  let months = Date.getMonths (Table.getColumn table "Date")
-  let wPath = "../../Downloads/" ++ path months
   writeFile wPath $ monthlyBudget cashDiff table
   putStrLn $ "Your monthly budget can be found at: " ++ wPath
 
@@ -49,3 +49,13 @@ getCashDiff = do
 path :: [String] -> String
 path [] = "budget.csv"
 path (m : ms) = m ++ "-" ++ path ms
+
+-- | For now this, returns a string to append to the month naming of the file
+-- | Right now, I'm thinking like ../reports/2020/april-budget.csv, but the year dir
+-- | needs to exist for this work.
+-- TODO: commands to make the directory.
+yearPrefix :: [String] -> String
+yearPrefix ys = if onlyOneYear then firstYear else firstYear ++ "-" ++ last ys
+  where
+    onlyOneYear = length ys == 1
+    firstYear = head ys
