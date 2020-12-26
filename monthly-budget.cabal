@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f99c4a3f3d252b1d77649e9fbc5baac42fa7978ad40392f65dc21ba212fc8c28
+-- hash: b26440c7636b27f4795501e3ba51c24c8d0b124fbe2873240bd1975781755ce3
 
 name:           monthly-budget
 version:        0.1.0.0
@@ -40,6 +40,7 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
+    , directory
     , parsec
     , split
   default-language: Haskell2010
@@ -54,6 +55,7 @@ executable monthly-budget-exe
   build-depends:
       base >=4.7 && <5
     , containers
+    , directory
     , monthly-budget
     , parsec
     , split
@@ -70,6 +72,7 @@ test-suite monthly-budget-test
   build-depends:
       base >=4.7 && <5
     , containers
+    , directory
     , monthly-budget
     , parsec
     , split
