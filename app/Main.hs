@@ -1,46 +1,76 @@
 module Main where
 
 import qualified Date
--- import qualified Debug.Trace as Debug
 import Lib (monthlyBudget)
+import System.Directory (listDirectory)
 import qualified Table
 import Text.Read (readMaybe)
 
-main :: IO ()
+-- not sure if I'm gonna keep this, but it helps for debugging while writing this out.
+data InputMethod = Requested | FromDir | Debugging | None
+
+startingInputMethod :: InputMethod
+startingInputMethod = FromDir -- Change this to play around
+
+type MonthlyBudget = String
+
+main :: IO [()]
 main = do
-  table <- csvToTable
-  let ds = Table.getColumn table "Date"
-  let wPath = "./generated_reports/" ++ yearPrefix (Date.getYears ds) ++ "." ++ path (Date.getMonths ds)
-  cashDiff <- getCashDiff
+  tables <- csvToTables startingInputMethod
+  mapM doStuff tables
+  where
+    doStuff :: Table.Table -> IO ()
+    doStuff t = do
+      cashDiff <- getCashDiff (getStartAndEndDates t)
+      writeToReports cashDiff t
+
+writeToReports :: Float -> Table.Table -> IO ()
+writeToReports cashDiff table = do
+  let wPath = buildReportPath table
   writeFile wPath $ monthlyBudget cashDiff table
-  putStrLn $ "Your monthly budget can be found at: " ++ wPath
+  putStrLn $ "Your monthly budget(s) can be found in " ++ wPath
+
+getStartAndEndDates :: Table.Table -> (String, String)
+getStartAndEndDates t = Date.getRange (t `Table.getColumn` "Date")
+
+buildReportPath :: Table.Table -> FilePath
+buildReportPath table =
+  let ds = Table.getColumn table "Date"
+   in "./generated_reports/" ++ yearPrefix (Date.getYears ds) ++ "." ++ path (Date.getMonths ds)
 
 -- TODO: check for a CSV in some designated input folder before requesting it.
-csvToTable :: IO Table.Table
-csvToTable =
-  putStrLn "Path to CSV (relative to this program):"
-    >> getLine
-      >>= readFile
-      -- debugging shortcut: uncomment below and comment above
-      -- readFile "../../Downloads/EXPORT.csv"
-      >>= toTable
-  where
-    toTable :: String -> IO Table.Table
-    toTable c = case Table.fromCSV c of
-      Left e -> putStrLn "Failed reading CSV!" >> print e >> csvToTable
-      Right t -> return t
+csvToTables :: InputMethod -> IO [Table.Table]
+csvToTables inputMethod =
+  case inputMethod of
+    None -> putStrLn "Aborting. See ya." >> return [[]]
+    Debugging -> readFile "../../Downloads/EXPORT.csv" >>= toTable >>= toIOArr
+    Requested ->
+      putStrLn "Path to CSV (relative to this program):"
+        >> getLine
+          >>= readFile
+          >>= toTable
+          >>= toIOArr
+    FromDir -> do
+      dirs <- listDirectory "./csvs"
+      putStrLn $ "Dirs" ++ show dirs
+      mapM fpToTable dirs
+      where
+        fpToTable :: FilePath -> IO Table.Table
+        fpToTable fp = readFile ("./csvs/" ++ fp) >>= toTable
 
-getCashDiff :: IO Float
-getCashDiff = do
-  putStrLn "How much cash on-hand at end of period?"
-  remainingCash <- getLine >>= readCashInputOr getCashDiff
-  startingCash <- getStartingCash
-  return (remainingCash - startingCash)
+toIOArr :: a -> IO [a]
+toIOArr x = return [x]
+
+toTable :: String -> IO Table.Table
+toTable c = case Table.fromCSV c of
+  Left e -> putStrLn "Failed reading CSV!" >> print e >> return [[]]
+  Right t -> return t
+
+getCashDiff :: (String, String) -> IO Float
+getCashDiff (startDate, endDate) = do
+  putStrLn $ "Enter cash diff between " ++ startDate ++ " and " ++ endDate
+  getLine >>= readCashInputOr (getCashDiff (startDate, endDate))
   where
-    getStartingCash :: IO Float
-    getStartingCash = do
-      putStrLn "How much did you have on-hand at the start of this period?"
-      getLine >>= readCashInputOr getStartingCash
     readCashInputOr :: IO Float -> String -> IO Float
     readCashInputOr onFail cash = case readMaybe cash of
       Nothing -> putStrLn "Needs to be a number. Try Again." >> onFail
