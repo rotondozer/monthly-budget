@@ -5,7 +5,6 @@ where
 
 import qualified CashFlow
 import qualified Data.Maybe as Maybe
-import qualified Date
 import qualified Table
 
 monthlyBudget :: Float -> Table.Table -> String
