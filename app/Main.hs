@@ -31,7 +31,7 @@ writeToReports cashDiff table = do
   putStrLn $ "Your monthly budget(s) can be found in " ++ wPath
 
 getStartAndEndDates :: Table.Table -> (String, String)
-getStartAndEndDates t = Date.getRange (t `Table.getColumn` "Date")
+getStartAndEndDates t = Date.getStartAndEndDates (t `Table.getColumn` "Date")
 
 buildReportPath :: Table.Table -> FilePath
 buildReportPath table =

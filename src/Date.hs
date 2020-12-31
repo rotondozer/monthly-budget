@@ -1,4 +1,4 @@
-module Date (toLongDate, getMonths, getYears, getRange) where
+module Date (toLongDate, getMonths, getYears, getStartAndEndDates) where
 
 import Data.List (sort)
 import Data.List.Split (linesBy)
@@ -39,8 +39,8 @@ toLongDate = gettem . toYMDList
     gettem :: [String] -> String
     gettem (y : m : d : _) = getLongMonth (readInt m) ++ " " ++ d ++ ", " ++ pad20 y
 
-getRange :: [CSVDate] -> (CSVDate, CSVDate)
-getRange dates =
+getStartAndEndDates :: [CSVDate] -> (CSVDate, CSVDate)
+getStartAndEndDates dates =
   let sortedDates = sortAsRawDates dates
    in (fromDateToCSVDate $ head sortedDates, fromDateToCSVDate $ last sortedDates)
 
@@ -94,7 +94,7 @@ fromDateToCSVDate = fromYMDListToCSVDate . fromDateToYMDList
 
 -- | ["20", "4", "13"] -> "4/13/2020"
 fromYMDListToCSVDate :: YMDList -> CSVDate
-fromYMDListToCSVDate (y : m : d : _) = d ++ "/" ++ m ++ "/" ++ y
+fromYMDListToCSVDate (y : m : d : _) = m ++ "/" ++ d ++ "/" ++ y
 
 -- | 20200413 -> ["2020", "04", "13"]
 fromDateToYMDList :: RawDate -> YMDList
