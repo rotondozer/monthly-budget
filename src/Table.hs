@@ -14,7 +14,6 @@ where
 
 import Data.List
 import Data.Maybe as Maybe
-import Debug.Trace as Debug
 import qualified Parser
 import Text.Parsec (ParseError)
 import qualified Util

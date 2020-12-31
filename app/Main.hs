@@ -38,7 +38,6 @@ buildReportPath table =
   let ds = Table.getColumn table "Date"
    in "./generated_reports/" ++ yearPrefix (Date.getYears ds) ++ "." ++ path (Date.getMonths ds)
 
--- TODO: check for a CSV in some designated input folder before requesting it.
 csvToTables :: InputMethod -> IO [Table.Table]
 csvToTables inputMethod =
   case inputMethod of
