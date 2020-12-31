@@ -52,7 +52,7 @@ csvToTables inputMethod =
           >>= toIOArr
     FromDir -> do
       dirs <- listDirectory "./csvs"
-      putStrLn $ "Dirs" ++ show dirs
+      putStrLn $ "Reading " ++ show (length dirs) ++ " CSV files: " ++ show dirs
       mapM fpToTable dirs
       where
         fpToTable :: FilePath -> IO Table.Table
