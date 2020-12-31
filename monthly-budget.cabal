@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f99c4a3f3d252b1d77649e9fbc5baac42fa7978ad40392f65dc21ba212fc8c28
+-- hash: 6c5995c74b7a5468d52a5f3bdd59805a27efdc9249a52d7abec913e97a57ad76
 
 name:           monthly-budget
-version:        0.1.0.0
+version:        0.2.0.0
 description:    Please see the README on GitHub at <https://github.com/rotondozer/monthly-budget#readme>
 homepage:       https://github.com/rotondozer/monthly-budget#readme
 bug-reports:    https://github.com/rotondozer/monthly-budget/issues
@@ -40,6 +40,7 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
+    , directory
     , parsec
     , split
   default-language: Haskell2010
@@ -54,6 +55,7 @@ executable monthly-budget-exe
   build-depends:
       base >=4.7 && <5
     , containers
+    , directory
     , monthly-budget
     , parsec
     , split
@@ -70,6 +72,7 @@ test-suite monthly-budget-test
   build-depends:
       base >=4.7 && <5
     , containers
+    , directory
     , monthly-budget
     , parsec
     , split

@@ -13,7 +13,7 @@ module Table
 where
 
 import Data.List
-import qualified Data.Maybe as Maybe
+import Data.Maybe as Maybe
 import qualified Parser
 import Text.Parsec (ParseError)
 import qualified Util

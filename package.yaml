@@ -5,23 +5,24 @@ tests:
     source-dirs: test
     main: Spec.hs
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - monthly-budget
+      - monthly-budget
 copyright: 2020 Nick Rotondo (rotondozer)
 maintainer: nickrotondo724@gmail.com
 dependencies:
-- parsec
-- containers
-- split
-- base >= 4.7 && < 5
+  - parsec
+  - containers
+  - split
+  - directory
+  - base >= 4.7 && < 5
 name: monthly-budget
-version: 0.1.0.0
+version: 0.2.0.0
 extra-source-files:
-- README.md
-- ChangeLog.md
+  - README.md
+  - ChangeLog.md
 author: Nick Rotondo
 github: rotondozer/monthly-budget
 license: BSD3
@@ -30,9 +31,9 @@ executables:
     source-dirs: app
     main: Main.hs
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - monthly-budget
+      - monthly-budget
 description: Please see the README on GitHub at <https://github.com/rotondozer/monthly-budget#readme>
