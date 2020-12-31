@@ -42,20 +42,15 @@ getCell (headers : _) header row =
   (header `elemIndex` headers) >>= \i -> return (row !! i)
 
 getColumn :: Table -> ColHeader -> [String]
-getColumn t colH = tail' (Maybe.mapMaybe getCell' t)
+getColumn t colH = tail (Maybe.mapMaybe getCell' t)
   where
     getCell' = getCell t colH
-    tail' :: [a] -> [a]
-    tail' ls
-      | null ls = Debug.trace "getColumn" []
-      | otherwise = tail ls
 
 create :: [ColHeader] -> Table
 create colHs = [colHs]
 
 addRow :: Row -> Table -> Table
 addRow r t
-  | null t = Debug.trace "no head for you" t
   | length (head t) /= length r = Util.logWarn t
   | otherwise = t ++ [r]
 

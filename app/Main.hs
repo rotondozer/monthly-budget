@@ -17,10 +17,10 @@ type MonthlyBudget = String
 main :: IO [()]
 main = do
   tables <- csvToTables startingInputMethod
-  mapM doStuff tables
+  mapM toMonthlyBudget tables
   where
-    doStuff :: Table.Table -> IO ()
-    doStuff t = do
+    toMonthlyBudget :: Table.Table -> IO ()
+    toMonthlyBudget t = do
       cashDiff <- getCashDiff (getStartAndEndDates t)
       writeToReports cashDiff t
 

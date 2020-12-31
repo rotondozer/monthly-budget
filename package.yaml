@@ -19,7 +19,7 @@ dependencies:
   - directory
   - base >= 4.7 && < 5
 name: monthly-budget
-version: 0.1.0.0
+version: 0.2.0.0
 extra-source-files:
   - README.md
   - ChangeLog.md
